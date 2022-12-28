@@ -8,10 +8,10 @@ MAINTAINER Markus Sabadello <markus@danubetech.com>
 WORKDIR /usr/src/app
 COPY . .
 RUN rm -rf node_modules/
-RUN npm install
+RUN yarn
 
 # done
 
 EXPOSE 9080
 
-CMD [ "node", "index.ts" ]
+CMD [ "yarn", "ts-node", "index" ]
