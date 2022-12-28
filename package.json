@@ -1,0 +1,30 @@
+{
+  "name": "danubetech-uni-registrar-veramo",
+  "version": "0.1.0",
+  "description": "Universal Registrar Driver",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "prestart": "npm install",
+    "start": "node index.js"
+  },
+  "keywords": [
+    "swagger"
+  ],
+  "license": "Unlicense",
+  "private": true,
+  "dependencies": {
+    "@veramo/core": "4.2.0",
+    "@veramo/did-manager": "4.2.0",
+    "@veramo/did-provider-ethr": "4.2.0",
+    "@veramo/did-resolver": "4.2.0",
+    "@veramo/key-manager": "4.2.0",
+    "@veramo/kms-local": "4.2.0",
+    "express": "4.18.2",
+    "tslib": "2.4.0"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.1",
+    "typescript": "^4.9.4"
+  }
+}
