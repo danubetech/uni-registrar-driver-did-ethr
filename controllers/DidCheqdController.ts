@@ -5,7 +5,7 @@ import DefaultService from '../service/DefaultService';
 
 export default {
     create: function(req: any, res: any) {
-        DefaultService.create(req.body)
+        DefaultService.create(req.body, 'did:cheqd')
             .then(function (response) {
                 writer.writeJson(res, response);
             })
@@ -15,7 +15,7 @@ export default {
     },
 
     update: function(req: any, res: any) {
-        DefaultService.update(req.body)
+        DefaultService.update(req.body, 'did:cheqd')
             .then(function (response) {
                 writer.writeJson(res, response);
             })
@@ -25,7 +25,7 @@ export default {
     },
 
     deactivate: function(req: any, res: any) {
-        DefaultService.deactivate(req.body)
+        DefaultService.deactivate(req.body, 'did:cheqd')
             .then(function (response) {
                 writer.writeJson(res, response);
             })

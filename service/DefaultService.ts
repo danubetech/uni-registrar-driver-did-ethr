@@ -11,14 +11,16 @@ export default {
      * body CreateRequest  (optional)
      * returns CreateState
      **/
-    create: function(body: any) {
+    create: function(body: any, provider: string) {
         const options = body.options;
         const didDocument = body.didDocument;
         return new Promise(function (resolve, reject) {
             try {
-                console.log(typeof agent);
-                console.log(typeof agent.didManagerCreate);
-                agent.didManagerCreate({alias: 'default'}).then((identifier: any) => {
+                agent.didManagerCreate({
+                    alias: 'default',
+                    provider: provider,
+                    options: options
+                }).then((identifier: any) => {
                     console.log(`New identifier created`);
                     console.log(JSON.stringify(identifier, null, 2));
                     const did = "did:test:test";
@@ -74,7 +76,7 @@ export default {
      * body UpdateRequest  (optional)
      * returns UpdateState
      **/
-    update: function(body: string) {
+    update: function(body: string, provider: string) {
         return new Promise(function (resolve, reject) {
             reject("Not implemented");
         });
@@ -86,7 +88,7 @@ export default {
      * body DeactivateRequest  (optional)
      * returns DeactivateState
      **/
-    deactivate: function(body: string) {
+    deactivate: function(body: string, provider: string) {
         return new Promise(function (resolve, reject) {
             reject("Not implemented");
         });
