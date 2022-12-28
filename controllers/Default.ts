@@ -1,10 +1,10 @@
 'use strict';
 
-import write from '../utils/writer.js';
-import DefaultService from '../service/DefaultService.js';
+import writer from '../utils/writer';
+import DefaultService from '../service/DefaultService';
 
 export default {
-    create: function (req, res) {
+    create: function(req: any, res: any) {
         DefaultService.create(req.body)
             .then(function (response) {
                 writer.writeJson(res, response);
@@ -14,7 +14,7 @@ export default {
             });
     },
 
-    update: function(req, res) {
+    update: function(req: any, res: any) {
         DefaultService.update(req.body)
             .then(function (response) {
                 writer.writeJson(res, response);
@@ -24,7 +24,7 @@ export default {
             });
     },
 
-    deactivate: function(req, res) {
+    deactivate: function(req: any, res: any) {
         DefaultService.deactivate(req.body)
             .then(function (response) {
                 writer.writeJson(res, response);

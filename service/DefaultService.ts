@@ -1,8 +1,8 @@
 'use strict';
 
-import agent from '../utils/agent.js';
+import { agent } from '../utils/agent';
 
-import verificationMethodUtils from '../utils/verificationMethodUtils.js';
+import verificationMethodUtils from '../utils/verificationMethodUtils';
 
 export default {
     /**
@@ -11,16 +11,20 @@ export default {
      * body CreateRequest  (optional)
      * returns CreateState
      **/
-    create: function(body) {
+    create: function(body: any) {
         const options = body.options;
         const didDocument = body.didDocument;
         return new Promise(function (resolve, reject) {
             try {
                 console.log(typeof agent);
                 console.log(typeof agent.didManagerCreate);
-                agent.didManagerCreate({alias: 'default'}).then((identifier) => {
+                agent.didManagerCreate({alias: 'default'}).then((identifier: any) => {
                     console.log(`New identifier created`);
                     console.log(JSON.stringify(identifier, null, 2));
+                    const did = "did:test:test";
+                    console.log("did: " + did);
+                    const didUrl = did + "#" + "test";
+                    console.log("didUrl: " + didUrl);
                     const response = verificationMethodUtils.finishedResponse(did, didUrl);
                     resolve(response);
                 });
@@ -70,7 +74,7 @@ export default {
      * body UpdateRequest  (optional)
      * returns UpdateState
      **/
-    update: function(body) {
+    update: function(body: string) {
         return new Promise(function (resolve, reject) {
             reject("Not implemented");
         });
@@ -82,7 +86,7 @@ export default {
      * body DeactivateRequest  (optional)
      * returns DeactivateState
      **/
-    deactivate: function(body) {
+    deactivate: function(body: string) {
         return new Promise(function (resolve, reject) {
             reject("Not implemented");
         });

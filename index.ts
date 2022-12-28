@@ -2,7 +2,7 @@
 
 import http from 'http';
 import express from 'express';
-import controllers from './controllers/Default.js';
+import controllers from './controllers/Default';
 
 const serverPort = 9080;
 
@@ -10,7 +10,7 @@ const app = express();
 
 app.use(express.json());
 
-app.use((err, req, res, next) => {
+app.use((err: any, req: any, res: any, next: any) => {
     res.status(err.status || 500).json({
         message: err.message,
         errors: err.errors,

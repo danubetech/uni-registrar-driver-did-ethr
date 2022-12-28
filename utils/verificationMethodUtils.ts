@@ -1,7 +1,7 @@
 
 export default {
-    actionGetVerificationMethodResponse: function(type) {
-        const publicKeyJwkTemplate = publicKeyJwkTemplateForType(type);
+    actionGetVerificationMethodResponse: function(type: string) {
+        const publicKeyJwkTemplate = this.publicKeyJwkTemplateForType(type);
         console.log("publicKeyJwkTemplate for type " + type + ": " + JSON.stringify(publicKeyJwkTemplate));
         return {
             "jobId": null,
@@ -18,7 +18,7 @@ export default {
         };
     },
 
-    finishedResponse: function (did, didUrl) {
+    finishedResponse: function(did: string, didUrl: string) {
         return {
             "jobId": null,
             "didState": {
@@ -40,9 +40,9 @@ export default {
         };
     },
 
-    publicKeyJwkTemplateForType: function (type) {
+    publicKeyJwkTemplateForType: function(type: string) {
         if (type) type = type.toLowerCase();
-        switch (type) {
+        switch(type) {
             case 'rsa':
                 return {
                     "kty": "RSA"

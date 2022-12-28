@@ -1,19 +1,10 @@
-var ResponsePayload = function (code, payload) {
-    this.code = code;
-    this.payload = payload;
-}
-
 export default {
-    respondWithCode: function(code, payload) {
-        return new ResponsePayload(code, payload);
-    },
-
-    writeJson: function(response, arg1, arg2) {
+    writeJson: function(response: any, arg1: any, arg2?: any) {
         var code;
         var payload;
 
         if (arg1 && arg1.payload && arg1.code) {
-            writeJson(response, arg1.payload, arg1.code);
+            this.writeJson(response, arg1.payload, arg1.code);
             return;
         }
 
