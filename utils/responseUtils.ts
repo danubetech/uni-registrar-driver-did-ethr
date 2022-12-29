@@ -18,24 +18,12 @@ export default {
         };
     },
 
-    finishedResponse: function(did: string, didUrl: string) {
+    finishedResponse: function(did: string) {
         return {
             "jobId": null,
             "didState": {
                 "did": did,
-                "state": "finished",
-                "secret": {
-                    "verificationMethod": [
-                        [{
-                            "id": "#temp",
-                            "purpose": ["authentication"]
-                        }, {
-                            "id": didUrl,
-                            "controller": did,
-                            "purpose": ["authentication", "assertionMethod", "capabilityInvocation", "capabilityDelegation", "keyAgreement"]
-                        }]
-                    ]
-                }
+                "state": "finished"
             }
         };
     },

@@ -3,6 +3,7 @@
 import writer from '../utils/writer';
 import DefaultService from '../service/DefaultService';
 
+// see https://github.com/UCRegistry/chain-registry/tree/master/chains
 export default {
     create: function(req: any, res: any) {
         DefaultService.create(req.body, 'did:pkh')

@@ -2,7 +2,7 @@
 
 import { agent } from '../utils/agent';
 
-import verificationMethodUtils from '../utils/verificationMethodUtils';
+import responseUtils from '../utils/responseUtils';
 
 export default {
     /**
@@ -21,13 +21,10 @@ export default {
                     provider: provider,
                     options: options
                 }).then((identifier: any) => {
-                    console.log(`New identifier created`);
-                    console.log(JSON.stringify(identifier, null, 2));
-                    const did = "did:test:test";
+                    console.log(`identifier: ` + JSON.stringify(identifier, null, 2));
+                    const did = identifier.did;
                     console.log("did: " + did);
-                    const didUrl = did + "#" + "test";
-                    console.log("didUrl: " + didUrl);
-                    const response = verificationMethodUtils.finishedResponse(did, didUrl);
+                    const response = responseUtils.finishedResponse(did);
                     resolve(response);
                 });
 

@@ -1,5 +1,5 @@
 
-import { createAgent, IDIDManager, IKeyManager, IDataStore, IDataStoreORM } from '@veramo/core';
+import { createAgent, IDIDManager, IKeyManager, IDataStore, IDataStoreORM, IResolver } from '@veramo/core';
 import { DIDManager, MemoryDIDStore} from '@veramo/did-manager';
 import { EthrDIDProvider } from '@veramo/did-provider-ethr';
 import { PkhDIDProvider } from '@veramo/did-provider-pkh';
@@ -7,7 +7,20 @@ import { CheqdDIDProvider } from '@cheqd/did-provider-cheqd';
 import { KeyManager, MemoryKeyStore, MemoryPrivateKeyStore} from '@veramo/key-manager';
 import { KeyManagementSystem } from '@veramo/kms-local';
 
-const INFURA_PROJECT_ID = 'ceaa1e1503234310b7b42dbad742a94d';
+const ethrNetworks = process.env.uniregistrar_driver_veramo_ethrNetworks;
+const ethrNetworkRpcUrls = process.env.uniregistrar_driver_veramo_ethrNetworkRpcUrls;
+const cheqdCosmosPayerMnemonic = process.env.uniregistrar_driver_veramo_cheqdCosmosPayerMnemonic;
+
+if (! ethrNetworks) throw "Missing 'uniregistrar_driver_veramo_ethrNetworks' variable.";
+if (! ethrNetworkRpcUrls) throw "Missing 'uniregistrar_driver_veramo_ethrNetworkRpcUrls' variable.";
+if (! cheqdCosmosPayerMnemonic) throw "Missing 'uniregistrar_driver_veramo_cheqdCosmosPayerMnemonic' variable.";
+
+const ethrNetworksList = ethrNetworks.split(";");
+const ethrNetworkRpcUrlsList = ethrNetworkRpcUrls.split(";");
+
+const networks = [];
+for (var i=0; i<ethrNetworksList.length; i++) { networks.push({ name: ethrNetworksList[i], rpcUrl: ethrNetworkRpcUrlsList[i] }) }
+const cosmosPayerMnemonic = cheqdCosmosPayerMnemonic;
 
 export const agent = createAgent < IDIDManager & IKeyManager & IDataStore & IDataStoreORM > ({
     plugins: [
@@ -23,25 +36,14 @@ export const agent = createAgent < IDIDManager & IKeyManager & IDataStore & IDat
             providers: {
                 'did:ethr': new EthrDIDProvider({
                     defaultKms: 'local',
-                    networks: [
-                        {
-                            name: 'mainnet',
-                            rpcUrl: 'https://mainnet.infura.io/v3/' + INFURA_PROJECT_ID,
-                        }, {
-                            name: 'goerli',
-                            rpcUrl: 'https://goerli.infura.io/v3/' + INFURA_PROJECT_ID,
-                        }, {
-                            name: 'sepolia',
-                            rpcUrl: 'https://sepolia.infura.io/v3/' + INFURA_PROJECT_ID,
-                        }
-                    ]
+                    networks: networks
                 }),
                 'did:pkh': new PkhDIDProvider({
                     defaultKms: 'local'
                 }),
                 'did:cheqd': new CheqdDIDProvider({
                     defaultKms: 'local',
-                    cosmosPayerMnemonic: 'glory remain shrug expand feed they notice similar diagram acquire hour razor'
+                    cosmosPayerMnemonic: cosmosPayerMnemonic
                 }),
             },
         })
