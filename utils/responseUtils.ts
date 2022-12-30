@@ -1,92 +1,92 @@
 
 export default {
-    actionGetVerificationMethodResponse: function(type: string) {
-        const publicKeyJwkTemplate = this.publicKeyJwkTemplateForType(type);
-        console.log("publicKeyJwkTemplate for type " + type + ": " + JSON.stringify(publicKeyJwkTemplate));
-        return {
-            "jobId": null,
-            "didState": {
-                "state": "action",
-                "action": "getVerificationMethod",
-                "verificationMethodTemplate": [{
-                    "id": "#temp",
-                    "type": "JsonWebKey2020",
-                    "purpose": ["authentication"],
-                    "publicKeyJwk": publicKeyJwkTemplate
-                }]
-            }
-        };
+
+    actionGetVerificationMethodResponse: function(provider: string) {
+
+        if ('did:ethr' === provider) {
+            return {
+                "jobId": null,
+                "didState": {
+                    "state": "action",
+                    "action": "getVerificationMethod",
+                    "verificationMethodTemplate": [{
+                        "id": "#controllerKey",
+                        "type": "EcdsaSecp256k1VerificationKey2019"
+                    }]
+                }
+            };
+        } else if ('did:pkh' === provider) {
+            return {
+                "jobId": null,
+                "didState": {
+                    "state": "action",
+                    "action": "getVerificationMethod",
+                    "verificationMethodTemplate": [{
+                        "id": "#blockchainAccountIdKey",
+                        "type": "EcdsaSecp256k1VerificationKey2019"
+                    }]
+                }
+            };
+        } else if ('did:cheqd' === provider) {
+            return {
+                "jobId": null,
+                "didState": {
+                    "state": "action",
+                    "action": "getVerificationMethod",
+                    "verificationMethodTemplate": [{
+                        "type": "Ed25519VerificationKey2018"
+                    }]
+                }
+            };
+        } else {
+            throw 'Unsupported provider (actionGetVerificationMethodResponse): ' + provider;
+        }
     },
 
-    finishedResponse: function(did: string) {
-        return {
-            "jobId": null,
-            "didState": {
-                "did": did,
-                "state": "finished"
-            }
-        };
-    },
+    finishedResponse: function(provider: string, did: string) {
 
-    publicKeyJwkTemplateForType: function(type: string) {
-        if (type) type = type.toLowerCase();
-        switch(type) {
-            case 'rsa':
-                return {
-                    "kty": "RSA"
-                };
-            case 'secp256k1':
-                return {
-                    "kty": "EC",
-                    "crv": "secp256k1"
-                };
-            case 'bls12381g1':
-                return {
-                    "kty": "OKP",
-                    "crv": "Bls12381G1"
-                };
-            case 'bls12381g2':
-                return {
-                    "kty": "OKP",
-                    "crv": "Bls12381G2"
-                };
-            case 'bls48581g1':
-                return {
-                    "kty": "OKP",
-                    "crv": "Bls48581G1"
-                };
-            case 'bls48581g2':
-                return {
-                    "kty": "OKP",
-                    "crv": "Bls48581G2"
-                };
-            case 'ed25519':
-                return {
-                    "kty": "OKP",
-                    "crv": "Ed25519"
-                };
-            case 'x25519':
-                return {
-                    "kty": "OKP",
-                    "crv": "X25519"
-                };
-            case 'p-256':
-                return {
-                    "kty": "EC",
-                    "crv": "P-256"
-                };
-            case 'p-384':
-                return {
-                    "kty": "EC",
-                    "crv": "P-384"
-                };
-            case 'p-521':
-                return {
-                    "kty": "EC",
-                    "crv": "P-521"
-                };
-            default:
-                throw "Unknown key type: " + type;
+        if ('did:ethr' === provider) {
+            return {
+                "jobId": null,
+                "didState": {
+                    "did": did,
+                    "state": "finished",
+                    "secret": {
+                        "verificationMethod": [
+                            [{
+                                "id": "#controllerKey",
+                                "type": "EcdsaSecp256k1VerificationKey2019"
+                            }, {
+                                "id": did + "#controllerKey",
+                                "controller": did,
+                                "purpose": ["authentication", "assertionMethod"]
+                            }]
+                        ]
+                    }
+                }
+            };
+        } else if ('did:pkh' === provider) {
+            return {
+                "jobId": null,
+                "didState": {
+                    "did": did,
+                    "state": "finished",
+                    "secret": {
+                        "verificationMethod": [
+                            [{
+                                "id": "#blockchainAccountIdKey",
+                                "type": "EcdsaSecp256k1VerificationKey2019"
+                            }, {
+                                "id": did + "#blockchainAccountIdKey",
+                                "controller": did,
+                                "purpose": ["authentication", "assertionMethod"]
+                            }]
+                        ]
+                    }
+                }
+            };
+        } else {
+            throw 'Unsupported provider (finishedResponse): ' + provider;
         }
     }
 }
