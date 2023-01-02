@@ -20,11 +20,13 @@ export default {
                     return null;
                 }
 
+                const providerOptions = requestUtils.providerOptions(provider, options);
+
                 const agent = createTempAgent(provider, publicKeyHex);
                 agent.didManagerCreate({
                     alias: 'default',
                     provider: provider,
-                    options: options
+                    options: providerOptions
                 }).then((identifier: any) => {
                     console.log(`identifier: ` + JSON.stringify(identifier, null, 2));
                     const did = identifier.did;

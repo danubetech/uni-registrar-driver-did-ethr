@@ -34,7 +34,8 @@ export default {
                     "state": "action",
                     "action": "getVerificationMethod",
                     "verificationMethodTemplate": [{
-                        "type": "Ed25519VerificationKey2018"
+                        "id": "#key1",
+                        "type": "Ed25519VerificationKey2020"
                     }]
                 }
             };
