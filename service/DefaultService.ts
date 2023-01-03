@@ -33,6 +33,8 @@ export default {
                     console.log("did: " + did);
                     const response = responseUtils.finishedResponse(provider, did);
                     resolve(response);
+                }).catch((e) => {
+                    resolve({code: 500, payload: '' + e});
                 });
             } catch (e) {
                 console.log("ERROR: " + e);
