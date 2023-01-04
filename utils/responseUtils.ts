@@ -1,9 +1,9 @@
 
 export default {
 
-    actionGetVerificationMethodResponse: function(provider: string) {
+    actionGetVerificationMethodResponse: function(method: string) {
 
-        if ('did:ethr' === provider) {
+        if ('did:ethr' === method) {
             return {
                 "jobId": null,
                 "didState": {
@@ -15,7 +15,7 @@ export default {
                     }]
                 }
             };
-        } else if ('did:pkh' === provider) {
+        } else if ('did:pkh' === method) {
             return {
                 "jobId": null,
                 "didState": {
@@ -27,7 +27,7 @@ export default {
                     }]
                 }
             };
-        } else if ('did:cheqd' === provider) {
+        } else if ('did:cheqd' === method) {
             return {
                 "jobId": null,
                 "didState": {
@@ -40,13 +40,13 @@ export default {
                 }
             };
         } else {
-            throw 'Unsupported provider (actionGetVerificationMethodResponse): ' + provider;
+            throw 'Unsupported method (actionGetVerificationMethodResponse): ' + method;
         }
     },
 
-    finishedResponse: function(provider: string, did: string) {
+    finishedResponse: function(method: string, did: string) {
 
-        if ('did:ethr' === provider) {
+        if ('did:ethr' === method) {
             return {
                 "jobId": null,
                 "didState": {
@@ -66,7 +66,7 @@ export default {
                     }
                 }
             };
-        } else if ('did:pkh' === provider) {
+        } else if ('did:pkh' === method) {
             return {
                 "jobId": null,
                 "didState": {
@@ -87,7 +87,7 @@ export default {
                 }
             };
         } else {
-            throw 'Unsupported provider (finishedResponse): ' + provider;
+            throw 'Unsupported method (finishedResponse): ' + method;
         }
     }
 }

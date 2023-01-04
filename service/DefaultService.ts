@@ -7,33 +7,36 @@ import responseUtils from '../utils/responseUtils';
 
 export default {
 
-    create: function(body: any, provider: string) {
+    create: function(body: any, method: string) {
 
         const options = body.options;
         const didDocument = body.didDocument;
         return new Promise(function (resolve, reject) {
             try {
-                const publicKeyHex = requestUtils.validateDidDocument(provider, didDocument);
+                const publicKeyHex = requestUtils.validateDidDocument(method, didDocument);
                 if (! publicKeyHex) {
-                    const response = responseUtils.actionGetVerificationMethodResponse(provider);
+                    const response = responseUtils.actionGetVerificationMethodResponse(method);
                     resolve(response);
                     return null;
                 }
 
-                const providerOptions = requestUtils.providerOptions(provider, options);
+                const methodOptions = requestUtils.methodOptions(method, options);
+                const methodProvider = requestUtils.methodProvider(method, options);
 
-                const agent = createTempAgent(provider, publicKeyHex);
+                const agent = createTempAgent(methodProvider, publicKeyHex);
+                console.log('trying to create DID with agent: ' + agent);
                 agent.didManagerCreate({
                     alias: 'default',
-                    provider: provider,
-                    options: providerOptions
+                    provider: methodProvider,
+                    options: methodOptions
                 }).then((identifier: any) => {
-                    console.log(`identifier: ` + JSON.stringify(identifier, null, 2));
+                    console.log('successfully created DID: ' + JSON.stringify(identifier));
                     const did = identifier.did;
                     console.log("did: " + did);
-                    const response = responseUtils.finishedResponse(provider, did);
+                    const response = responseUtils.finishedResponse(method, did);
                     resolve(response);
                 }).catch((e) => {
+                    console.log('failed to create DID: ' + e.stack);
                     resolve({code: 500, payload: '' + e});
                 });
             } catch (e) {

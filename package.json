@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "main": "index.ts",
   "private": true,
+  "scripts": {
+    "start": "ts-node index.ts"
+  },
   "dependencies": {
     "@veramo/core": "4.2.0",
     "@veramo/did-manager": "4.2.0",
