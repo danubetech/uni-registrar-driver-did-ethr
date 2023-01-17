@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "preserveConstEnums": true,
+    "module": "commonjs",
     "strict": true,
     "target": "es6",
     "rootDir": "./",
