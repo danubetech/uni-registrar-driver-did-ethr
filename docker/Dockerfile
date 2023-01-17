@@ -7,7 +7,7 @@ MAINTAINER Markus Sabadello <markus@danubetech.com>
 
 WORKDIR /usr/src/app
 COPY . .
-RUN rm -rf node_modules/ && yarn
+RUN rm -rf node_modules/
 
 # variables
 
@@ -20,7 +20,9 @@ ENV uniregistrar_driver_veramo_cheqdNetworks=mainnet;testnet
 ENV uniregistrar_driver_veramo_cheqdNetworkRpcUrls=https://rpc.cheqd.net;https://rpc.cheqd.network
 ENV uniregistrar_driver_veramo_cheqdNetworkCosmosPayerMnemonics="glory remain shrug expand feed they notice similar diagram acquire hour razor;glory remain shrug expand feed they notice similar diagram acquire hour razor"
 
+RUN yarn install
+RUN yarn build
 # done
 
 EXPOSE 9080
-CMD [ "yarn", "ts-node", "index" ]
+CMD [ "yarn", "start" ]
