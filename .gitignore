@@ -8,3 +8,4 @@ output/
 *.log
 /.idea/
 *.iml
+build/
