@@ -3,7 +3,7 @@ import { AbstractIdentifierProvider, DIDManager } from '@veramo/did-manager';
 import { EthrDIDProvider } from '@veramo/did-provider-ethr';
 import { PkhDIDProvider } from '@veramo/did-provider-pkh';
 import { CheqdDIDProvider } from '@cheqd/did-provider-cheqd';
-import { NetworkType } from '@cheqd/did-provider-cheqd/build/did-manager/cheqd-did-provider';
+import { NetworkType } from '@cheqd/did-provider-cheqd/src/did-manager/cheqd-did-provider';
 import { KeyManager } from '@veramo/key-manager';
 import { OurDIDStore } from "../service/OurDIDStore";
 import { OurKeyStore } from "../service/OurKeyStore";
@@ -18,10 +18,10 @@ const ethrNetworks = process.env.uniregistrar_driver_veramo_ethrNetworks;
 const ethrNetworkRpcUrls = process.env.uniregistrar_driver_veramo_ethrNetworkRpcUrls;
 const cheqdNetworks = process.env.uniregistrar_driver_veramo_cheqdNetworks;
 const cheqdNetworkRpcUrls = process.env.uniregistrar_driver_veramo_cheqdNetworkRpcUrls;
-const cheqdNetworkCosmosPayerMnemonics = process.env.uniregistrar_driver_veramo_cheqdNetworkCosmosPayerMnemonics;
+const cheqdNetworkCosmosPayerSeeds = process.env.uniregistrar_driver_veramo_cheqdNetworkCosmosPayerSeeds;
 
 if (ethrEnabled && (! ethrNetworks || ! ethrNetworkRpcUrls)) throw("Missing 'uniregistrar_driver_veramo_ethrNetworks' or 'uniregistrar_driver_veramo_ethrNetworkRpcUrls' variable.");
-if (cheqdEnabled && (! cheqdNetworks || ! cheqdNetworkRpcUrls || ! cheqdNetworkCosmosPayerMnemonics)) throw("Missing 'uniregistrar_driver_veramo_cheqdNetworks' or 'uniregistrar_driver_veramo_cheqdNetworkRpcUrls'  or 'uniregistrar_driver_veramo_cheqdNetworkCosmosPayerMnemonics' variable.");
+if (cheqdEnabled && (! cheqdNetworks || ! cheqdNetworkRpcUrls || ! cheqdNetworkCosmosPayerSeeds)) throw("Missing 'uniregistrar_driver_veramo_cheqdNetworks' or 'uniregistrar_driver_veramo_cheqdNetworkRpcUrls'  or 'uniregistrar_driver_veramo_cheqdNetworkCosmosPayerSeeds' variable.");
 
 const providers: Record<string, AbstractIdentifierProvider> = { };
 if (ethrEnabled && ethrNetworks && ethrNetworkRpcUrls) {
@@ -43,14 +43,14 @@ if (pkhEnabled) {
     });
     console.log("Added 'did:pkh' provider.");
 }
-if (cheqdEnabled && cheqdNetworks && cheqdNetworkRpcUrls && cheqdNetworkCosmosPayerMnemonics) {
+if (cheqdEnabled && cheqdNetworks && cheqdNetworkRpcUrls && cheqdNetworkCosmosPayerSeeds) {
     const cheqdNetworksList = cheqdNetworks?.split(";");
     const cheqdNetworkRpcUrlsList = cheqdNetworkRpcUrls?.split(";");
-    const cheqdNetworkCosmosPayerMnemonicsList = cheqdNetworkCosmosPayerMnemonics?.split(";");
+    const cheqdNetworkCosmosPayerSeedsList = cheqdNetworkCosmosPayerSeeds?.split(";");
     for (var i=0; i<cheqdNetworksList.length; i++) {
         const network = cheqdNetworksList[i];
         const rpcUrl = cheqdNetworkRpcUrlsList[i];
-        const cosmosPayerMnemonic = cheqdNetworkCosmosPayerMnemonicsList[i];
+        const cosmosPayerSeed = cheqdNetworkCosmosPayerSeedsList[i];
         var networkType: NetworkType;
         if (network === 'mainnet') networkType = NetworkType.Mainnet;
         else if (network === 'testnet') networkType = NetworkType.Testnet;
@@ -59,7 +59,7 @@ if (cheqdEnabled && cheqdNetworks && cheqdNetworkRpcUrls && cheqdNetworkCosmosPa
             defaultKms: 'local',
             networkType: networkType,
             rpcUrl: rpcUrl,
-            cosmosPayerMnemonic: cosmosPayerMnemonic
+            cosmosPayerSeed: cosmosPayerSeed
         });
         console.log("Added 'did:cheqd:" + network + "' provider.");
     }
