@@ -6,7 +6,7 @@ on:
 env:
   GLOBAL_IMAGE_NAME: universalregistrar/danubetech-driver-veramo
   GLOBAL_REPO_NAME: repo.danubetech.com:5000
-  RELEASE_VERSION: 0.1.0
+  RELEASE_VERSION: 0.2.0
 
 jobs:
 
