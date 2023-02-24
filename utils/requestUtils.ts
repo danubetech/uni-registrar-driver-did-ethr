@@ -40,6 +40,7 @@ export default {
             methodOptions = { ...options };
             if (! options.chainId && options.network) {
                 methodOptions['chainId'] = methodOptions['network'];
+                delete methodOptions['network'];
             }
         } else if ('did:cheqd' === method) {
             methodOptions = { ...options };
@@ -71,5 +72,26 @@ export default {
 
         console.log('methodProvider: ' + methodProvider);
         return methodProvider;
+    },
+
+    methodPkhProviderChainId: function(method: string, options: any): any {
+
+        var methodPkhProviderChainId;
+
+        if ('did:ethr' === method) {
+            methodPkhProviderChainId = null;
+        } else if ('did:pkh' === method) {
+            methodPkhProviderChainId = options.chainId;
+            if (! methodPkhProviderChainId && options.network) {
+                methodPkhProviderChainId = options.network;
+            }
+        } else if ('did:cheqd' === method) {
+            methodPkhProviderChainId = null;
+        } else {
+            throw 'Unsupported method (methodPkhProviderChainId): ' + method;
+        }
+
+        console.log('methodPkhProviderChainId: ' + methodPkhProviderChainId);
+        return methodPkhProviderChainId;
     }
 }

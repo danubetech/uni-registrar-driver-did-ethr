@@ -27,7 +27,7 @@ const cheqdNetworkCosmosPayerSeeds = process.env.uniregistrar_driver_veramo_cheq
 if (ethrEnabled && (! ethrNetworks || ! ethrNetworkRpcUrls)) throw("Missing 'uniregistrar_driver_veramo_ethrNetworks' or 'uniregistrar_driver_veramo_ethrNetworkRpcUrls' variable.");
 if (cheqdEnabled && (! cheqdNetworks || ! cheqdNetworkRpcUrls || ! cheqdNetworkCosmosPayerSeeds)) throw("Missing 'uniregistrar_driver_veramo_cheqdNetworks' or 'uniregistrar_driver_veramo_cheqdNetworkRpcUrls'  or 'uniregistrar_driver_veramo_cheqdNetworkCosmosPayerSeeds' variable.");
 
-export const createTempAgent = async function (provider: string, publicKeyHex: string) {
+export const createTempAgent = async function (provider: string, publicKeyHex: string, pkhProviderChainId: string) {
 
     const providers: Record<string, AbstractIdentifierProvider> = { };
     if (ethrEnabled && ethrNetworks && ethrNetworkRpcUrls) {
@@ -45,7 +45,8 @@ export const createTempAgent = async function (provider: string, publicKeyHex: s
     }
     if (pkhEnabled) {
         providers['did:pkh'] = new PkhDIDProvider({
-            defaultKms: 'local'
+            defaultKms: 'local',
+            chainId: pkhProviderChainId
         });
         console.log("Added 'did:pkh' provider.");
     }

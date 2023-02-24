@@ -22,8 +22,9 @@ export default {
 
                 const methodOptions = requestUtils.methodOptions(method, options);
                 const methodProvider = requestUtils.methodProvider(method, options);
+                const methodPkhProviderChainId = requestUtils.methodPkhProviderChainId(method, options);
 
-                const agent = await createTempAgent(methodProvider, publicKeyHex);
+                const agent = await createTempAgent(methodProvider, publicKeyHex, methodPkhProviderChainId);
                 console.log('trying to create DID with agent: ' + agent);
                 agent.didManagerCreate({
                     alias: 'default',
