@@ -1,9 +1,9 @@
 'use strict';
 
-import { createTempAgent } from '../utils/agent';
+import { createTempAgent } from '../utils/agent.js';
 
-import requestUtils from '../utils/requestUtils';
-import responseUtils from '../utils/responseUtils';
+import requestUtils from '../utils/requestUtils.js';
+import responseUtils from '../utils/responseUtils.js';
 
 export default {
 
@@ -11,7 +11,7 @@ export default {
 
         const options = body.options;
         const didDocument = body.didDocument;
-        return new Promise(function (resolve, reject) {
+        return new Promise(async function (resolve, reject) {
             try {
                 const publicKeyHex = requestUtils.validateDidDocument(method, didDocument);
                 if (! publicKeyHex) {
@@ -23,7 +23,7 @@ export default {
                 const methodOptions = requestUtils.methodOptions(method, options);
                 const methodProvider = requestUtils.methodProvider(method, options);
 
-                const agent = createTempAgent(methodProvider, publicKeyHex);
+                const agent = await createTempAgent(methodProvider, publicKeyHex);
                 console.log('trying to create DID with agent: ' + agent);
                 agent.didManagerCreate({
                     alias: 'default',
@@ -35,11 +35,11 @@ export default {
                     console.log("did: " + did);
                     const response = responseUtils.finishedResponse(method, did);
                     resolve(response);
-                }).catch((e) => {
+                }).catch((e: any) => {
                     console.log('failed to create DID: ' + e.stack);
                     resolve({code: 500, payload: '' + e});
                 });
-            } catch (e) {
+            } catch (e: any) {
                 console.log("ERROR: " + e);
                 resolve({code: 500, payload: '' + e});
             }

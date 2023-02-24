@@ -1,4 +1,4 @@
-import { IIdentifier } from "@veramo/core";
+import type { IIdentifier } from "@veramo/core";
 import { AbstractDIDStore } from "@veramo/did-manager";
 
 export class OurDIDStore extends AbstractDIDStore {
