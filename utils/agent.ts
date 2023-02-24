@@ -5,7 +5,8 @@ import { DIDManager } from '@veramo/did-manager';
 import { EthrDIDProvider } from '@veramo/did-provider-ethr';
 import { PkhDIDProvider } from '@veramo/did-provider-pkh';
 import { CheqdDIDProvider } from '@cheqd/did-provider-cheqd';
-import { NetworkType } from '@cheqd/did-provider-cheqd/build/esm/did-manager/cheqd-did-provider.js';
+// @ts-ignore
+import { NetworkType } from '@cheqd/did-provider-cheqd/did-manager/cheqd-did-provider';
 import { KeyManager } from '@veramo/key-manager';
 import { createAgent } from '@veramo/core';
 import { OurDIDStore } from "../service/OurDIDStore.js";
