@@ -22,6 +22,7 @@ ENV uniregistrar_driver_veramo_cheqdNetworkCosmosPayerSeeds="glory remain shrug 
 
 RUN yarn install
 RUN yarn build
+
 # done
 
 EXPOSE 9080
