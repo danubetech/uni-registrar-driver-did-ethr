@@ -2,9 +2,9 @@
 
 import http from 'http';
 import express from 'express';
-import DidEthrController from './controllers/DidEthrController';
-import DidPkhController from './controllers/DidPkhController';
-import DidCheqdController from './controllers/DidCheqdController';
+import DidEthrController from './controllers/DidEthrController.js';
+import DidPkhController from './controllers/DidPkhController.js';
+import DidCheqdController from './controllers/DidCheqdController.js';
 
 const serverPort = 9080;
 

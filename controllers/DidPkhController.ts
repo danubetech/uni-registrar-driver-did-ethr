@@ -1,7 +1,7 @@
 'use strict';
 
-import writer from '../utils/writer';
-import DefaultService from '../service/DefaultService';
+import writer from '../utils/writer.js';
+import DefaultService from '../service/DefaultService.js';
 
 // see https://github.com/UCRegistry/chain-registry/tree/master/chains
 export default {
