@@ -3,19 +3,27 @@ import { AbstractKeyStore } from '@veramo/key-manager'
 
 export class OurKeyStore extends AbstractKeyStore {
   async deleteKey(args: { kid: string }): Promise<boolean> {
-    throw "Not implemented: OurKeyStore.get";
+    console.log("OurKeyStore.deleteKey args: " + JSON.stringify(args));
+    throw "Not implemented: OurKeyStore.deleteKey";
   }
 
   async getKey(args: { kid: string }): Promise<IKey> {
-    throw "Not implemented: OurKeyStore.delete";
+    console.log("OurKeyStore.getKey args: " + JSON.stringify(args));
+    return Promise.resolve({
+      kid: '',
+      kms: '',
+      type: 'Ed25519',
+      publicKeyHex: ''
+    });
   }
 
   async importKey(args: Partial<IKey>): Promise<boolean> {
-    console.log("OurKeyStore.import args: " + JSON.stringify(args));
-    return false;
+    console.log("OurKeyStore.importKey args: " + JSON.stringify(args));
+    return Promise.resolve(false);
   }
 
   async listKeys(args: {}): Promise<Array<ManagedKeyInfo>> {
-    throw "Not implemented: OurKeyStore.list";
+    console.log("OurKeyStore.listKeys args: " + JSON.stringify(args));
+    throw "Not implemented: OurKeyStore.listKeys";
   }
 }

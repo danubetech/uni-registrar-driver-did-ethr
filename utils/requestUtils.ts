@@ -32,18 +32,24 @@ export default {
 
     methodOptions: function(method: string, options: any): any {
 
-        var methodOptions;
+        var methodOptions: any;
 
         if ('did:ethr' === method) {
-            methodOptions = { ...options };
+            methodOptions = { };
+/*            if (options.network) {
+                methodOptions['network'] = options['network'];
+            }*/
         } else if ('did:pkh' === method) {
-            methodOptions = { ...options };
-            if (! options.chainId && options.network) {
-                methodOptions['chainId'] = methodOptions['network'];
-                delete methodOptions['network'];
+            methodOptions = { };
+            if (options.chainId) {
+                methodOptions['chainId'] = options['chainId'];
+            } else if (options.network) {
+                methodOptions['chainId'] = options['network'];
             }
         } else if ('did:cheqd' === method) {
-            methodOptions = { ...options };
+            if (options.network) {
+                methodOptions['network'] = options['network'];
+            }
         } else {
             throw 'Unsupported method (methodOptions): ' + method;
         }
