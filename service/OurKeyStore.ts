@@ -10,8 +10,8 @@ export class OurKeyStore extends AbstractKeyStore {
   async getKey(args: { kid: string }): Promise<IKey> {
     console.log("OurKeyStore.getKey args: " + JSON.stringify(args));
     return Promise.resolve({
-      kid: '',
-      kms: '',
+      kid: args.kid,
+      kms: 'local',
       type: 'Ed25519',
       publicKeyHex: ''
     });

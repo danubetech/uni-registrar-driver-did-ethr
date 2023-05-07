@@ -36,9 +36,10 @@ export default {
 
         if ('did:ethr' === method) {
             methodOptions = { };
-/*            if (options.network) {
+            if (options.network) {
                 methodOptions['network'] = options['network'];
-            }*/
+            }
+            methodOptions['metaIdentifierKeyId'] = 'metakey';
         } else if ('did:pkh' === method) {
             methodOptions = { };
             if (options.chainId) {
@@ -47,6 +48,7 @@ export default {
                 methodOptions['chainId'] = options['network'];
             }
         } else if ('did:cheqd' === method) {
+            methodOptions = { };
             if (options.network) {
                 methodOptions['network'] = options['network'];
             }
