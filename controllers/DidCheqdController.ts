@@ -1,11 +1,11 @@
 'use strict';
 
 import writer from '../utils/writer.js';
-import DefaultService from '../service/DefaultService.js';
+import CheqdService from "../service/CheqdService.js";
 
 export default {
     create: function(req: any, res: any) {
-        DefaultService.create(req.body, 'did:cheqd')
+        CheqdService.create(req.body, 'did:cheqd')
             .then(function (response) {
                 writer.writeJson(res, response);
             })
@@ -15,7 +15,7 @@ export default {
     },
 
     update: function(req: any, res: any) {
-        DefaultService.update(req.body, 'did:cheqd')
+        CheqdService.update(req.body, 'did:cheqd')
             .then(function (response) {
                 writer.writeJson(res, response);
             })
@@ -25,7 +25,7 @@ export default {
     },
 
     deactivate: function(req: any, res: any) {
-        DefaultService.deactivate(req.body, 'did:cheqd')
+        CheqdService.deactivate(req.body, 'did:cheqd')
             .then(function (response) {
                 writer.writeJson(res, response);
             })

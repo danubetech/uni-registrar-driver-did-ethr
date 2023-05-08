@@ -1,8 +1,8 @@
 'use strict';
 
-import { IKey, IService, IServiceEndpoint } from "@veramo/core";
+import {IKey, IService, IServiceEndpoint} from "@veramo/core";
 
-import { createTempAgent } from '../utils/agent.js';
+import {createPkhAgent} from "../utils/pkhAgent.js";
 
 import requestUtils from '../utils/requestUtils.js';
 import responseUtils from '../utils/responseUtils.js';
@@ -15,22 +15,20 @@ export default {
         const didDocument = body.didDocument;
         return new Promise(async function (resolve, reject) {
             try {
-                const publicKeyHex = requestUtils.validateDidDocument(method, didDocument);
+                const publicKeyHex = requestUtils.determineMethodPublicKeyHex(method, didDocument);
                 if (! publicKeyHex) {
                     const response = responseUtils.actionGetVerificationMethodResponse(method);
                     resolve(response);
                     return null;
                 }
 
-                const methodOptions = requestUtils.methodOptions(method, options);
-                const methodProvider = requestUtils.methodProvider(method, options);
-                const methodPkhProviderChainId = requestUtils.methodPkhProviderChainId(method, options);
+                const methodOptions = requestUtils.determineMethodOptions(method, options);
+                const methodChainId = determineMethodChainId(options);
 
-                const agent = await createTempAgent(methodProvider, 'create', publicKeyHex, methodPkhProviderChainId);
+                const agent = await createPkhAgent('create', '', methodChainId);
                 console.log('trying to create DID with agent: ' + agent);
                 agent.didManagerCreate({
                     alias: 'default',
-                    provider: methodProvider,
                     options: methodOptions
                 }).then((identifier: any) => {
                     console.log('successfully created DID: ' + JSON.stringify(identifier));
@@ -57,11 +55,10 @@ export default {
         const didDocuments = body.didDocument;
         return new Promise(async function (resolve, reject) {
             try {
-                const methodOptions = requestUtils.methodOptions(method, options);
-                const methodProvider = requestUtils.methodProvider(method, options);
-                const methodPkhProviderChainId = requestUtils.methodPkhProviderChainId(method, options);
+                const methodOptions = requestUtils.determineMethodOptions(method, options);
+                const methodChainId = determineMethodChainId(options);
 
-                const agent = await createTempAgent(methodProvider, 'update', '', methodPkhProviderChainId);
+                const agent = await createPkhAgent('update', '', methodChainId);
                 console.log('trying to update DID ' + did + ' with operations ' + JSON.stringify(didDocumentOperations) + ' with agent: ' + agent);
 
                 for (const i in didDocumentOperations) {
@@ -137,4 +134,13 @@ export default {
             reject("Not implemented");
         });
     }
+}
+
+const determineMethodChainId = function(options: any): any {
+
+    let methodChainId = options.chainId;
+    if (! methodChainId && options.network) methodChainId = options.network;
+
+    console.log('methodChainId: ' + methodChainId);
+    return methodChainId;
 }

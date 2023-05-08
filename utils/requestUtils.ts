@@ -1,7 +1,7 @@
 
 export default {
 
-    validateDidDocument: function(method: string, didDocument: any): string | null {
+    determineMethodPublicKeyHex: function(method: string, didDocument: any): string | null {
 
         if (! didDocument?.verificationMethod) return null;
 
@@ -30,7 +30,7 @@ export default {
         return publicKeyHex;
     },
 
-    methodOptions: function(method: string, options: any): any {
+    determineMethodOptions: function(method: string, options: any): any {
 
         var methodOptions: any;
 
@@ -59,47 +59,4 @@ export default {
         console.log('methodOptions: ' + JSON.stringify(methodOptions));
         return methodOptions;
     },
-
-    methodProvider: function(method: string, options: any): any {
-
-        var methodProvider;
-
-        if ('did:ethr' === method) {
-            methodProvider = 'did:ethr';
-        } else if ('did:pkh' === method) {
-            methodProvider = 'did:pkh';
-        } else if ('did:cheqd' === method) {
-            if (options.network) {
-                methodProvider = 'did:cheqd:' + options.network;
-            } else {
-                methodProvider = 'did:cheqd';
-            }
-        } else {
-            throw 'Unsupported method (methodProvider): ' + method;
-        }
-
-        console.log('methodProvider: ' + methodProvider);
-        return methodProvider;
-    },
-
-    methodPkhProviderChainId: function(method: string, options: any): any {
-
-        var methodPkhProviderChainId;
-
-        if ('did:ethr' === method) {
-            methodPkhProviderChainId = null;
-        } else if ('did:pkh' === method) {
-            methodPkhProviderChainId = options.chainId;
-            if (! methodPkhProviderChainId && options.network) {
-                methodPkhProviderChainId = options.network;
-            }
-        } else if ('did:cheqd' === method) {
-            methodPkhProviderChainId = null;
-        } else {
-            throw 'Unsupported method (methodPkhProviderChainId): ' + method;
-        }
-
-        console.log('methodPkhProviderChainId: ' + methodPkhProviderChainId);
-        return methodPkhProviderChainId;
-    }
 }
