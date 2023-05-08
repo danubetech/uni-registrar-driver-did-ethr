@@ -44,6 +44,35 @@ export default {
         }
     },
 
+    signingRequest: function(method: string, kid?: string, alg?: string, serializedPayload?: Uint8Array) {
+
+        if ('did:ethr' === method) {
+            let signingRequest: any = {};
+            if (kid) signingRequest['kid'] = kid;
+            if (alg) signingRequest['alg'] = 'ES256KCC';
+            if (serializedPayload) signingRequest['serializedPayload'] = [...serializedPayload].map(x => x.toString(16).padStart(2, '0')).join('');
+            return signingRequest;
+        } else {
+            throw 'Unsupported method (signingRequest): ' + method;
+        }
+    },
+
+    actionSignPayloadResponse: function(method: string, signingRequestSet: any) {
+
+        if ('did:ethr' === method) {
+            return {
+                "jobId": null,
+                "didState": {
+                    "state": "action",
+                    "action": "signPayload",
+                    "signingRequest": signingRequestSet
+                }
+            };
+        } else {
+            throw 'Unsupported method (actionSignPayloadResponse): ' + method;
+        }
+    },
+
     finishedResponse: function(method: string, did: string) {
 
         if ('did:ethr' === method) {

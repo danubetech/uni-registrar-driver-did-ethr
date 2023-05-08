@@ -9,7 +9,7 @@ import {AbstractKeyManagementSystem, AbstractKeyStore, KeyManager} from '@veramo
 
 const pkhEnabled = process.env.uniregistrar_driver_veramo_pkhEnabled || 'true';
 
-export const createPkhAgent = async function (operation: string, publicKeyHex: string, chainId: string) {
+export const createPkhAgent = async function (operation: string, publicKeyHex?: string, chainId?: string) {
 
     if (! pkhEnabled) throw("'pkh' not enabled.");
 
@@ -24,17 +24,17 @@ export const createPkhAgent = async function (operation: string, publicKeyHex: s
 
     const provider = 'did:pkh';
 
-    const keyStore = new OurKeyStore();
+    const keyStore = new OurKeyStore(operation);
 
-    const memoryDidStore = new OurDIDStore(provider, operation);
+    const didStore = new OurDIDStore(provider, operation);
 
     const didManager = new DIDManager({
-        store: memoryDidStore,
+        store: didStore,
         defaultProvider: provider,
         providers: providers
     });
 
-    const keyManagementSystem = new OurKeyManagementSystem(publicKeyHex);
+    const keyManagementSystem = new OurKeyManagementSystem(operation, publicKeyHex);
 
     const keyManager = new KeyManager({
         store: keyStore,
@@ -43,18 +43,22 @@ export const createPkhAgent = async function (operation: string, publicKeyHex: s
         },
     });
 
-    return createAgent<IDIDManager & IKeyManager & IDataStore & IDataStoreORM>({
+    const agent = createAgent<IDIDManager & IKeyManager & IDataStore & IDataStoreORM>({
         plugins: [
             keyManager,
             didManager
         ],
     });
+
+    return { keyStore, didStore, didManager, keyManagementSystem, keyManager, agent };
 };
 
 export class OurKeyStore extends AbstractKeyStore {
+    private readonly operation: string
 
-    constructor() {
-        super()
+    constructor(operation: string) {
+        super();
+        this.operation = operation;
         console.log("OurKeyStore.constructed: " + JSON.stringify(this));
     }
 
@@ -87,10 +91,12 @@ export class OurKeyStore extends AbstractKeyStore {
 }
 
 export class OurKeyManagementSystem extends AbstractKeyManagementSystem {
-    private readonly publicKeyHex: string
+    private readonly operation: string
+    private readonly publicKeyHex?: string
 
-    constructor(publicKeyHex: string) {
-        super()
+    constructor(operation: string, publicKeyHex?: string) {
+        super();
+        this.operation = operation;
         this.publicKeyHex = publicKeyHex
         console.log("OurKeyManagementSystem.constructed: " + JSON.stringify(this));
     }
@@ -139,7 +145,7 @@ export class OurDIDStore extends AbstractDIDStore {
     private readonly operation: string
 
     constructor(provider: string, operation: string) {
-        super()
+        super();
         this.provider = provider;
         this.operation = operation;
         console.log("OurDIDStore.constructed: " + JSON.stringify(this));
@@ -157,7 +163,7 @@ export class OurDIDStore extends AbstractDIDStore {
         } else {
             let identifier: IIdentifier = {
                 did: args.did,
-                provider: args.provider,
+                provider: this.provider,
                 controllerKeyId: args.did + '#blockchainAccountIdKey',
                 keys: [],
                 services: []

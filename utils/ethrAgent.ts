@@ -14,7 +14,7 @@ const ethrNetworkRpcUrls = process.env.uniregistrar_driver_veramo_ethrNetworkRpc
 
 if (ethrEnabled && (! ethrNetworks || ! ethrNetworkRpcUrls)) throw("Missing 'uniregistrar_driver_veramo_ethrNetworks' or 'uniregistrar_driver_veramo_ethrNetworkRpcUrls' variable.");
 
-export const createEthrAgent = async function (operation: string, publicKeyHex: string) {
+export const createEthrAgent = async function (operation: string, publicKeyHex?: string, signingResponseSet?: any) {
 
     if (! ethrEnabled) throw("'ethr' not enabled.");
 
@@ -35,17 +35,17 @@ export const createEthrAgent = async function (operation: string, publicKeyHex: 
 
     const provider = 'did:ethr';
 
-    const keyStore = new OurKeyStore();
+    const keyStore = new OurKeyStore(operation);
 
-    const memoryDidStore = new OurDIDStore(provider, operation);
+    const didStore = new OurDIDStore(provider, operation);
 
     const didManager = new DIDManager({
-        store: memoryDidStore,
+        store: didStore,
         defaultProvider: provider,
         providers: providers
     });
 
-    const keyManagementSystem = new OurKeyManagementSystem(publicKeyHex);
+    const keyManagementSystem = new OurKeyManagementSystem(operation, publicKeyHex);
 
     const keyManager = new KeyManager({
         store: keyStore,
@@ -54,18 +54,22 @@ export const createEthrAgent = async function (operation: string, publicKeyHex: 
         },
     });
 
-    return createAgent<IDIDManager & IKeyManager & IDataStore & IDataStoreORM>({
+    const agent = createAgent<IDIDManager & IKeyManager & IDataStore & IDataStoreORM>({
         plugins: [
             keyManager,
             didManager
         ],
     });
+
+    return { keyStore, didStore, didManager, keyManagementSystem, keyManager, agent };
 };
 
 class OurKeyStore extends AbstractKeyStore {
+    private readonly operation: string
 
-    constructor() {
-        super()
+    constructor(operation: string) {
+        super();
+        this.operation = operation;
         console.log("OurKeyStore.constructed: " + JSON.stringify(this));
     }
 
@@ -98,10 +102,16 @@ class OurKeyStore extends AbstractKeyStore {
 }
 
 class OurKeyManagementSystem extends AbstractKeyManagementSystem {
-    private readonly publicKeyHex: string
+    private readonly operation: string
+    private readonly publicKeyHex?: string
+    public signKid?: string
+    public signAlgorithm?: string
+    public signData?: Uint8Array
+    public signResponse?: Uint8Array
 
-    constructor(publicKeyHex: string) {
-        super()
+    constructor(operation: string, publicKeyHex?: string) {
+        super();
+        this.operation = operation;
         this.publicKeyHex = publicKeyHex;
         console.log("OurKeyManagementSystem.constructed: " + JSON.stringify(this));
     }
@@ -141,6 +151,18 @@ class OurKeyManagementSystem extends AbstractKeyManagementSystem {
 
     async sign(args: { keyRef: Pick<IKey, "kid">; algorithm?: string; data: Uint8Array; [p: string]: any }): Promise<string> {
         console.log("OurKeyManagementSystem.sign args: " + JSON.stringify(args));
+        if (this.signResponse) {
+            let signResponse: string = [...this.signResponse].map(x => x.toString(16).padStart(2, '0')).join('');
+            console.log("OurKeyManagementSystem.sign result: " + signResponse);
+            return Promise.resolve(signResponse);
+        } else if (args.data) {
+            this.signKid = args.keyRef.kid;
+            this.signAlgorithm = args.algorithm;
+            this.signData = args.data;
+            let signResponse = '';
+            console.log("OurKeyManagementSystem.sign result: " + signResponse);
+            return Promise.resolve(signResponse);
+        }
         throw "Not implemented: OurKeyManagementSystem.sign";
     }
 }
@@ -150,7 +172,7 @@ class OurDIDStore extends AbstractDIDStore {
     private readonly operation: string
 
     constructor(provider: string, operation: string) {
-        super()
+        super();
         this.provider = provider;
         this.operation = operation;
         console.log("OurDIDStore.constructed: " + JSON.stringify(this));
@@ -168,7 +190,7 @@ class OurDIDStore extends AbstractDIDStore {
         } else {
             let identifier: IIdentifier = {
                 did: args.did,
-                provider: args.provider,
+                provider: this.provider,
                 controllerKeyId: args.did + '#controllerKey',
                 keys: [],
                 services: []

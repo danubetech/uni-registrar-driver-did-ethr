@@ -13,20 +13,21 @@ export default {
 
         const options = body.options;
         const didDocument = body.didDocument;
+
         return new Promise(async function (resolve, reject) {
             try {
-                const publicKeyHex = requestUtils.determineMethodPublicKeyHex(method, didDocument);
-                if (! publicKeyHex) {
-                    const response = responseUtils.actionGetVerificationMethodResponse(method);
-                    resolve(response);
-                    return null;
+                const methodPublicKeyHex = requestUtils.determineMethodPublicKeyHex(method, didDocument);
+                if (! methodPublicKeyHex) {
+                    const actionGetVerificationMethod = responseUtils.actionGetVerificationMethodResponse(method);
+                    resolve(actionGetVerificationMethod);
+                    return;
                 }
 
                 const methodOptions = requestUtils.determineMethodOptions(method, options);
 
-                const agent = await createEthrAgent('create', publicKeyHex);
+                const { agent } = await createEthrAgent('create', methodPublicKeyHex, undefined);
                 console.log('trying to create DID with agent: ' + agent);
-                agent.didManagerCreate({
+                await agent.didManagerCreate({
                     alias: 'default',
                     options: methodOptions
                 }).then((identifier: any) => {
@@ -35,13 +36,16 @@ export default {
                     console.log("did: " + did);
                     const response = responseUtils.finishedResponse(method, did);
                     resolve(response);
+                    return;
                 }).catch((e: any) => {
                     console.log('failed to create DID: ' + e.stack);
                     resolve({code: 500, payload: '' + e});
+                    return;
                 });
             } catch (e: any) {
                 console.log("ERROR: " + e);
                 resolve({code: 500, payload: '' + e});
+                return;
             }
         });
     },
@@ -52,12 +56,16 @@ export default {
         const options = body.options;
         const didDocumentOperations = body.didDocumentOperation;
         const didDocuments = body.didDocument;
+        const signingResponseSet = body.secret?.signingResponse;
+
         return new Promise(async function (resolve, reject) {
             try {
                 const methodOptions = requestUtils.determineMethodOptions(method, options);
 
-                const agent = await createEthrAgent('update', '');
+                const { keyManagementSystem, agent } = await createEthrAgent('update', undefined, signingResponseSet);
                 console.log('trying to update DID ' + did + ' with operations ' + JSON.stringify(didDocumentOperations) + ' with agent: ' + agent);
+
+                let signingRequestSet: any = {};
 
                 for (const i in didDocumentOperations) {
                     const didDocumentOperation = didDocumentOperations[i];
@@ -73,20 +81,29 @@ export default {
                                 type: didDocumentVerificationMethod.type,
                                 publicKeyHex: didDocumentVerificationMethod.publicKeyHex
                             }
-                            console.log('trying to add key: ' + JSON.stringify(key));
-                            agent.didManagerAddKey({
+                            const signingRequestId = 'signingRequestV' + i;
+                            const signingResponse = signingResponseSet?.[signingRequestId];
+                            console.log('found signing response ' + signingRequestId + ': ' + JSON.stringify(signingResponse));
+                            if (signingResponse?.signature) {
+                                keyManagementSystem.signResponse = Buffer.from(signingResponse.signature, 'base64');
+                            }
+                            console.log('trying to add key to did ' + did + ' with options ' + JSON.stringify(options) + ': ' + JSON.stringify(key));
+                            await agent.didManagerAddKey({
                                 did: did,
                                 key: key,
                                 options: methodOptions
                             }).then((identifier: any) => {
                                 console.log('successfully added key to DID: ' + JSON.stringify(identifier));
-                                const did = identifier.did;
-                                console.log("did: " + did);
-                                const response = responseUtils.finishedResponse(method, did);
-                                resolve(response);
                             }).catch((e: any) => {
+                                if (e.reason.includes('signature missing') && ! signingResponse) {
+                                    const signingRequest = responseUtils.signingRequest(method, keyManagementSystem.signKid, keyManagementSystem.signAlgorithm, keyManagementSystem.signData);
+                                    signingRequestSet[signingRequestId] = signingRequest;
+                                    console.log('added signing request ' + signingRequestId + ': ' + JSON.stringify(signingRequest));
+                                    return;
+                                }
                                 console.log('failed to add key to DID: ' + e.stack);
                                 resolve({code: 500, payload: '' + e});
+                                return;
                             });
                         }
                         if (Array.isArray(didDocument.service)) for (const didDocumentService of didDocument.service) {
@@ -97,20 +114,29 @@ export default {
                                 type: didDocumentService.type,
                                 serviceEndpoint: didDocumentServiceEndpoint
                             }
-                            console.log('trying to add service: ' + JSON.stringify(service));
-                            agent.didManagerAddService({
+                            const signingRequestId = 'signingRequestS' + i;
+                            const signingResponse = signingResponseSet?.[signingRequestId];
+                            console.log('found signing response ' + signingRequestId + ': ' + JSON.stringify(signingResponse));
+                            if (signingResponse?.signature) {
+                                keyManagementSystem.signResponse = Buffer.from(signingResponse.signature, 'base64');
+                            }
+                            console.log('trying to add service to did ' + did + ' with options ' + JSON.stringify(options) + ': ' + JSON.stringify(service));
+                            await agent.didManagerAddService({
                                 did: did,
                                 service: service,
                                 options: methodOptions
                             }).then((identifier: any) => {
                                 console.log('successfully added service to DID: ' + JSON.stringify(identifier));
-                                const did = identifier.did;
-                                console.log("did: " + did);
-                                const response = responseUtils.finishedResponse(method, did);
-                                resolve(response);
                             }).catch((e: any) => {
+                                if (e.reason.includes('signature missing') && ! signingResponse) {
+                                    const signingRequest = responseUtils.signingRequest(method, keyManagementSystem.signKid, keyManagementSystem.signAlgorithm, keyManagementSystem.signData);
+                                    signingRequestSet[signingRequestId] = signingRequest;
+                                    console.log('added signing request ' + signingRequestId + ': ' + JSON.stringify(signingRequest));
+                                    return;
+                                }
                                 console.log('failed to add service to DID: ' + e.stack);
                                 resolve({code: 500, payload: '' + e});
+                                return;
                             });
                         }
                     } else if (didDocumentOperation === 'removeFromDidDocument') {
@@ -119,9 +145,20 @@ export default {
                         throw "Missing or unsupported didDocumentOperation: " + didDocumentOperation;
                     }
                 }
+
+                if (Object.keys(signingRequestSet).length > 0) {
+                    const actionSignPayload = responseUtils.actionSignPayloadResponse(method, signingRequestSet);
+                    resolve(actionSignPayload);
+                    return;
+                }
+
+                const response = responseUtils.finishedResponse(method, did);
+                resolve(response);
+                return;
             } catch (e: any) {
                 console.log("ERROR: " + e);
                 resolve({code: 500, payload: '' + e});
+                return;
             }
         });
     },

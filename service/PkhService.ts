@@ -15,19 +15,19 @@ export default {
         const didDocument = body.didDocument;
         return new Promise(async function (resolve, reject) {
             try {
-                const publicKeyHex = requestUtils.determineMethodPublicKeyHex(method, didDocument);
-                if (! publicKeyHex) {
+                const methodPublicKeyHex = requestUtils.determineMethodPublicKeyHex(method, didDocument);
+                if (! methodPublicKeyHex) {
                     const response = responseUtils.actionGetVerificationMethodResponse(method);
                     resolve(response);
-                    return null;
+                    return;
                 }
 
                 const methodOptions = requestUtils.determineMethodOptions(method, options);
                 const methodChainId = determineMethodChainId(options);
 
-                const agent = await createPkhAgent('create', '', methodChainId);
+                const { agent } = await createPkhAgent('create', methodPublicKeyHex, methodChainId);
                 console.log('trying to create DID with agent: ' + agent);
-                agent.didManagerCreate({
+                await agent.didManagerCreate({
                     alias: 'default',
                     options: methodOptions
                 }).then((identifier: any) => {
@@ -36,13 +36,16 @@ export default {
                     console.log("did: " + did);
                     const response = responseUtils.finishedResponse(method, did);
                     resolve(response);
+                    return;
                 }).catch((e: any) => {
                     console.log('failed to create DID: ' + e.stack);
                     resolve({code: 500, payload: '' + e});
+                    return;
                 });
             } catch (e: any) {
                 console.log("ERROR: " + e);
                 resolve({code: 500, payload: '' + e});
+                return;
             }
         });
     },
@@ -58,7 +61,7 @@ export default {
                 const methodOptions = requestUtils.determineMethodOptions(method, options);
                 const methodChainId = determineMethodChainId(options);
 
-                const agent = await createPkhAgent('update', '', methodChainId);
+                const { agent } = await createPkhAgent('update', '', methodChainId);
                 console.log('trying to update DID ' + did + ' with operations ' + JSON.stringify(didDocumentOperations) + ' with agent: ' + agent);
 
                 for (const i in didDocumentOperations) {
@@ -76,19 +79,16 @@ export default {
                                 publicKeyHex: didDocumentVerificationMethod.publicKeyHex
                             }
                             console.log('trying to add key: ' + JSON.stringify(key));
-                            agent.didManagerAddKey({
+                            await agent.didManagerAddKey({
                                 did: did,
                                 key: key,
                                 options: methodOptions
                             }).then((identifier: any) => {
                                 console.log('successfully added key to DID: ' + JSON.stringify(identifier));
-                                const did = identifier.did;
-                                console.log("did: " + did);
-                                const response = responseUtils.finishedResponse(method, did);
-                                resolve(response);
                             }).catch((e: any) => {
                                 console.log('failed to add key to DID: ' + e.stack);
                                 resolve({code: 500, payload: '' + e});
+                                return;
                             });
                         }
                         if (Array.isArray(didDocument.service)) for (const didDocumentService of didDocument.service) {
@@ -100,19 +100,16 @@ export default {
                                 serviceEndpoint: didDocumentServiceEndpoint
                             }
                             console.log('trying to add service: ' + JSON.stringify(service));
-                            agent.didManagerAddService({
+                            await agent.didManagerAddService({
                                 did: did,
                                 service: service,
                                 options: methodOptions
                             }).then((identifier: any) => {
                                 console.log('successfully added service to DID: ' + JSON.stringify(identifier));
-                                const did = identifier.did;
-                                console.log("did: " + did);
-                                const response = responseUtils.finishedResponse(method, did);
-                                resolve(response);
                             }).catch((e: any) => {
                                 console.log('failed to add service to DID: ' + e.stack);
                                 resolve({code: 500, payload: '' + e});
+                                return;
                             });
                         }
                     } else if (didDocumentOperation === 'removeFromDidDocument') {
@@ -121,9 +118,14 @@ export default {
                         throw "Missing or unsupported didDocumentOperation: " + didDocumentOperation;
                     }
                 }
+
+                const response = responseUtils.finishedResponse(method, did);
+                resolve(response);
+                return;
             } catch (e: any) {
                 console.log("ERROR: " + e);
                 resolve({code: 500, payload: '' + e});
+                return;
             }
         });
     },
