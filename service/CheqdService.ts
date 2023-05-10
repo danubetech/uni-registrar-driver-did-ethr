@@ -23,10 +23,10 @@ export default {
                     return;
                 }
 
-                const methodOptions = requestUtils.determineMethodOptions(method, options);
+                const methodOptions = requestUtils.determineMethodOptions(method, 'create', options);
                 const methodNetwork = determineMethodNetwork(options);
 
-                const { agent } = await createCheqdAgent('create', methodPublicKeyHex, methodNetwork);
+                const { agent } = await createCheqdAgent('create', methodNetwork, methodPublicKeyHex);
                 console.log('trying to create DID with agent: ' + agent);
                 await agent.didManagerCreate({
                     alias: 'default',
@@ -60,10 +60,10 @@ export default {
 
         return new Promise(async function (resolve, reject) {
             try {
-                const methodOptions = requestUtils.determineMethodOptions(method, options);
+                const methodOptions = requestUtils.determineMethodOptions(method, 'update', options);
                 const methodNetwork = determineMethodNetwork(options);
 
-                const { agent } = await createCheqdAgent('update', '', methodNetwork);
+                const { agent } = await createCheqdAgent('update', methodNetwork, undefined);
                 console.log('trying to update DID ' + did + ' with operations ' + JSON.stringify(didDocumentOperations) + ' with agent: ' + agent);
 
                 for (const i in didDocumentOperations) {

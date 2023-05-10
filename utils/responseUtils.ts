@@ -44,13 +44,13 @@ export default {
         }
     },
 
-    signingRequest: function(method: string, kid?: string, alg?: string, serializedPayload?: Uint8Array) {
+    signingRequest: function(method: string, kid?: string, alg?: string, data?: Uint8Array) {
 
         if ('did:ethr' === method) {
             let signingRequest: any = {};
             if (kid) signingRequest['kid'] = kid;
-            if (alg) signingRequest['alg'] = 'ES256KCC';
-            if (serializedPayload) signingRequest['serializedPayload'] = [...serializedPayload].map(x => x.toString(16).padStart(2, '0')).join('');
+            if (alg) signingRequest['alg'] = 'ES256KRR';
+            if (data) signingRequest['serializedPayload'] = Buffer.from(data).toString('base64');
             return signingRequest;
         } else {
             throw 'Unsupported method (signingRequest): ' + method;

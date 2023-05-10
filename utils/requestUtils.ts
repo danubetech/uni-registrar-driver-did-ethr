@@ -30,14 +30,16 @@ export default {
         return publicKeyHex;
     },
 
-    determineMethodOptions: function(method: string, options: any): any {
+    determineMethodOptions: function(method: string, operation: string, options: any): any {
 
         var methodOptions: any;
 
         if ('did:ethr' === method) {
             methodOptions = { };
-            if (options.network) {
-                methodOptions['network'] = options['network'];
+            if ('create' === operation) {
+                if (options.network) {
+                    methodOptions['network'] = options['network'];
+                }
             }
             methodOptions['metaIdentifierKeyId'] = 'metakey';
         } else if ('did:pkh' === method) {

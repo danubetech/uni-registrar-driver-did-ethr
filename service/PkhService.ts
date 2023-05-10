@@ -22,10 +22,10 @@ export default {
                     return;
                 }
 
-                const methodOptions = requestUtils.determineMethodOptions(method, options);
+                const methodOptions = requestUtils.determineMethodOptions(method, 'create', options);
                 const methodChainId = determineMethodChainId(options);
 
-                const { agent } = await createPkhAgent('create', methodPublicKeyHex, methodChainId);
+                const { agent } = await createPkhAgent('create', methodChainId, methodPublicKeyHex);
                 console.log('trying to create DID with agent: ' + agent);
                 await agent.didManagerCreate({
                     alias: 'default',
@@ -58,10 +58,10 @@ export default {
         const didDocuments = body.didDocument;
         return new Promise(async function (resolve, reject) {
             try {
-                const methodOptions = requestUtils.determineMethodOptions(method, options);
+                const methodOptions = requestUtils.determineMethodOptions(method, 'update', options);
                 const methodChainId = determineMethodChainId(options);
 
-                const { agent } = await createPkhAgent('update', '', methodChainId);
+                const { agent } = await createPkhAgent('update', methodChainId, undefined);
                 console.log('trying to update DID ' + did + ' with operations ' + JSON.stringify(didDocumentOperations) + ' with agent: ' + agent);
 
                 for (const i in didDocumentOperations) {

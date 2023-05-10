@@ -9,11 +9,12 @@ import {AbstractKeyManagementSystem, AbstractKeyStore, KeyManager} from '@veramo
 
 const pkhEnabled = process.env.uniregistrar_driver_veramo_pkhEnabled || 'true';
 
-export const createPkhAgent = async function (operation: string, publicKeyHex?: string, chainId?: string) {
+export const createPkhAgent = async function (operation: string, chainId: string, publicKeyHex?: string) {
 
     if (! pkhEnabled) throw("'pkh' not enabled.");
 
     const providers: Record<string, AbstractIdentifierProvider> = { };
+
     if (pkhEnabled) {
         providers['did:pkh'] = new PkhDIDProvider({
             defaultKms: 'local',
@@ -75,13 +76,15 @@ export class OurKeyStore extends AbstractKeyStore {
             type: 'Ed25519',
             publicKeyHex: ''
         };
-        console.log("OutKeyStore.getKey result: " + JSON.stringify(key));
+        console.log("OurKeyStore.getKey result: " + JSON.stringify(key));
         return Promise.resolve(key);
     }
 
     async importKey(args: Partial<IKey>): Promise<boolean> {
         console.log("OurKeyStore.importKey args: " + JSON.stringify(args));
-        return Promise.resolve(false);
+        const result = false;
+        console.log("OurKeyStore.importKey result: " + JSON.stringify(result));
+        return Promise.resolve(result);
     }
 
     async listKeys(args: {}): Promise<Array<ManagedKeyInfo>> {
@@ -153,7 +156,9 @@ export class OurDIDStore extends AbstractDIDStore {
 
     async importDID(args: IIdentifier): Promise<boolean> {
         console.log("OurDIDStore.import args: " + JSON.stringify(args));
-        return Promise.resolve(false);
+        const result = false;
+        console.log("OurDIDStore.importDID result: " + JSON.stringify(result));
+        return Promise.resolve(result);
     }
 
     async getDID(args: { did: string; alias: string; provider: string }): Promise<IIdentifier> {

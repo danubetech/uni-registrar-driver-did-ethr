@@ -5,26 +5,51 @@ import {AbstractDIDStore, DIDManager} from '@veramo/did-manager';
 import {EthrDIDProvider} from '@veramo/did-provider-ethr';
 // @ts-ignore
 import {NetworkType} from '@cheqd/did-provider-cheqd/did-manager/cheqd-did-provider';
-import {AbstractKeyManagementSystem, AbstractKeyStore, KeyManager} from '@veramo/key-manager';
+import {AbstractKeyManagementSystem, AbstractKeyStore, AbstractPrivateKeyStore, KeyManager} from '@veramo/key-manager';
+import {EthrNetworkConfiguration} from "@veramo/did-provider-ethr/src/ethr-did-provider";
+import {JsonRpcProvider} from "@ethersproject/providers";
+import {Wallet} from "@ethersproject/wallet";
+import {KeyManagementSystem} from "@veramo/kms-local";
+import {ImportablePrivateKey, ManagedPrivateKey} from "@veramo/key-manager";
 
 const ethrEnabled = process.env.uniregistrar_driver_veramo_ethrEnabled || 'true';
 
 const ethrNetworks = process.env.uniregistrar_driver_veramo_ethrNetworks;
 const ethrNetworkRpcUrls = process.env.uniregistrar_driver_veramo_ethrNetworkRpcUrls;
+const ethrNetworkMetaPrivateKeys = process.env.uniregistrar_driver_veramo_ethrNetworkMetaPrivateKeys;
+const ethrNetworkMetaPublicKeys = process.env.uniregistrar_driver_veramo_ethrNetworkMetaPublicKeys;
 
-if (ethrEnabled && (! ethrNetworks || ! ethrNetworkRpcUrls)) throw("Missing 'uniregistrar_driver_veramo_ethrNetworks' or 'uniregistrar_driver_veramo_ethrNetworkRpcUrls' variable.");
+if (ethrEnabled && (! ethrNetworks || ! ethrNetworkRpcUrls || ! ethrNetworkMetaPrivateKeys || ! ethrNetworkMetaPublicKeys)) throw("Missing 'uniregistrar_driver_veramo_ethrNetworks' or 'uniregistrar_driver_veramo_ethrNetworkRpcUrls' or 'uniregistrar_driver_veramo_ethrNetworkMetaPrivateKeys' or 'uniregistrar_driver_veramo_ethrNetworkMetaPublicKeys' variable.");
 
-export const createEthrAgent = async function (operation: string, publicKeyHex?: string, signingResponseSet?: any) {
+export const createEthrAgent = async function (operation: string, network: string, publicKeyHex?: string) {
 
     if (! ethrEnabled) throw("'ethr' not enabled.");
 
     const providers: Record<string, AbstractIdentifierProvider> = { };
-    if (ethrEnabled && ethrNetworks && ethrNetworkRpcUrls) {
+    let metaPrivateKey: string | undefined;
+    let metaPublicKey: string | undefined;
+
+    if (ethrEnabled && ethrNetworks && ethrNetworkRpcUrls && ethrNetworkMetaPrivateKeys && ethrNetworkMetaPublicKeys) {
         const ethrNetworksList = ethrNetworks?.split(";");
         const ethrNetworkRpcUrlsList = ethrNetworkRpcUrls?.split(";");
+        const ethrNetworkMetaPrivateKeysList = ethrNetworkMetaPrivateKeys?.split(";");
+        const ethrNetworkMetaPublicKeysList = ethrNetworkMetaPublicKeys?.split(";");
         const networks = [];
         for (var i=0; i<ethrNetworksList.length; i++) {
-            networks.push({name: ethrNetworksList[i], rpcUrl: ethrNetworkRpcUrlsList[i]})
+            if (network !== ethrNetworksList[i]) continue;
+            const ethrNetwork = ethrNetworksList[i];
+            const ethrNetworkRpcUrl = ethrNetworkRpcUrlsList[i];
+            const ethrNetworkMetaPrivateKey = ethrNetworkMetaPrivateKeysList[i];
+            const ethrNetworkMetaPublicKey = ethrNetworkMetaPublicKeysList[i];
+            const provider: JsonRpcProvider = new JsonRpcProvider(ethrNetworkRpcUrl, ethrNetwork);
+            const wallet: Wallet = new Wallet(ethrNetworkMetaPrivateKey, provider);
+            const ethrNetworkConfiguration: EthrNetworkConfiguration = {
+                name: ethrNetwork,
+                provider: provider
+            };
+            networks.push(ethrNetworkConfiguration)
+            metaPrivateKey = ethrNetworkMetaPrivateKey;
+            metaPublicKey = ethrNetworkMetaPublicKey;
         }
         providers['did:ethr'] = new EthrDIDProvider({
             defaultKms: 'local',
@@ -35,7 +60,9 @@ export const createEthrAgent = async function (operation: string, publicKeyHex?:
 
     const provider = 'did:ethr';
 
-    const keyStore = new OurKeyStore(operation);
+    const keyStore = new OurKeyStore(operation, metaPublicKey);
+
+    const privateKeyStore = new OurPrivateKeyStore(operation, metaPrivateKey);
 
     const didStore = new OurDIDStore(provider, operation);
 
@@ -45,7 +72,7 @@ export const createEthrAgent = async function (operation: string, publicKeyHex?:
         providers: providers
     });
 
-    const keyManagementSystem = new OurKeyManagementSystem(operation, publicKeyHex);
+    const keyManagementSystem = new OurKeyManagementSystem(privateKeyStore, operation, publicKeyHex);
 
     const keyManager = new KeyManager({
         store: keyStore,
@@ -66,10 +93,12 @@ export const createEthrAgent = async function (operation: string, publicKeyHex?:
 
 class OurKeyStore extends AbstractKeyStore {
     private readonly operation: string
+    private readonly metaPublicKey?: string
 
-    constructor(operation: string) {
+    constructor(operation: string, metaPublicKey?: string) {
         super();
         this.operation = operation;
+        this.metaPublicKey = metaPublicKey;
         console.log("OurKeyStore.constructed: " + JSON.stringify(this));
     }
 
@@ -80,19 +109,31 @@ class OurKeyStore extends AbstractKeyStore {
 
     async getKey(args: { kid: string }): Promise<IKey> {
         console.log("OurKeyStore.getKey args: " + JSON.stringify(args));
-        let key: IKey = {
-            kid: args.kid,
-            kms: 'local',
-            type: 'Ed25519',
-            publicKeyHex: ''
-        };
-        console.log("OutKeyStore.getKey result: " + JSON.stringify(key));
+        let key: IKey;
+        if ('metakey' === args.kid) {
+            key = {
+                kid: args.kid,
+                kms: 'local',
+                type: 'Secp256k1',
+                publicKeyHex: this.metaPublicKey as string
+            };
+        } else {
+            key = {
+                kid: args.kid,
+                kms: 'local',
+                type: 'Secp256k1',
+                publicKeyHex: ''
+            };
+        }
+        console.log("OurKeyStore.getKey result: " + JSON.stringify(key));
         return Promise.resolve(key);
     }
 
     async importKey(args: Partial<IKey>): Promise<boolean> {
         console.log("OurKeyStore.importKey args: " + JSON.stringify(args));
-        return Promise.resolve(false);
+        const result = false;
+        console.log("OurKeyStore.importKey result: " + JSON.stringify(result));
+        return Promise.resolve(result);
     }
 
     async listKeys(args: {}): Promise<Array<ManagedKeyInfo>> {
@@ -101,7 +142,56 @@ class OurKeyStore extends AbstractKeyStore {
     }
 }
 
+class OurPrivateKeyStore extends AbstractPrivateKeyStore {
+    private readonly operation: string
+    private readonly metaPrivateKey?: string
+
+    constructor(operation: string, metaPrivateKey?: string) {
+        super();
+        this.operation = operation;
+        this.metaPrivateKey = metaPrivateKey;
+        console.log("OurPrivateKeyStore.constructed: " + JSON.stringify(this));
+    }
+
+    async importKey(args: ImportablePrivateKey): Promise<ManagedPrivateKey> {
+        console.log("OurPrivateKeyStore.importKey args: " + JSON.stringify(args));
+        throw "Not implemented: OurPrivateKeyStore.importKey";
+    }
+
+    async getKey(args: { alias: string }): Promise<ManagedPrivateKey> {
+        console.log("OurPrivateKeyStore.getKey args: " + JSON.stringify(args));
+        let key: ManagedPrivateKey;
+        if ('metakey' === args.alias) {
+            key = {
+                alias: args.alias,
+                type: 'Secp256k1',
+                privateKeyHex: this.metaPrivateKey as string
+            };
+        } else {
+            key = {
+                alias: args.alias,
+                type: 'Secp256k1',
+                privateKeyHex: 'f85035541e7a120eb74810710fcf40d694473d868ec4ab2b06c79fcb620a6c5b'
+            };
+//            throw new Error("Private key " + args.alias + " not available.");
+        }
+        console.log("OurPrivateKeyStore.getKey result: " + JSON.stringify(key));
+        return Promise.resolve(key);
+    }
+
+    async deleteKey(args: { alias: string }): Promise<boolean> {
+        console.log("OurPrivateKeyStore.deleteKey args: " + JSON.stringify(args));
+        throw "Not implemented: OurPrivateKeyStore.deleteKey";
+    }
+
+    async listKeys(args: {}): Promise<Array<ManagedPrivateKey>> {
+        console.log("OurPrivateKeyStore.listKeys args: " + JSON.stringify(args));
+        throw "Not implemented: OurPrivateKeyStore.listKeys";
+    }
+}
+
 class OurKeyManagementSystem extends AbstractKeyManagementSystem {
+    private readonly privateKeyStore: AbstractPrivateKeyStore
     private readonly operation: string
     private readonly publicKeyHex?: string
     public signKid?: string
@@ -109,8 +199,9 @@ class OurKeyManagementSystem extends AbstractKeyManagementSystem {
     public signData?: Uint8Array
     public signResponse?: Uint8Array
 
-    constructor(operation: string, publicKeyHex?: string) {
+    constructor(privateKeyStore: AbstractPrivateKeyStore, operation: string, publicKeyHex?: string) {
         super();
+        this.privateKeyStore = privateKeyStore;
         this.operation = operation;
         this.publicKeyHex = publicKeyHex;
         console.log("OurKeyManagementSystem.constructed: " + JSON.stringify(this));
@@ -151,19 +242,25 @@ class OurKeyManagementSystem extends AbstractKeyManagementSystem {
 
     async sign(args: { keyRef: Pick<IKey, "kid">; algorithm?: string; data: Uint8Array; [p: string]: any }): Promise<string> {
         console.log("OurKeyManagementSystem.sign args: " + JSON.stringify(args));
+        let signResponse: string;
         if (this.signResponse) {
-            let signResponse: string = [...this.signResponse].map(x => x.toString(16).padStart(2, '0')).join('');
-            console.log("OurKeyManagementSystem.sign result: " + signResponse);
-            return Promise.resolve(signResponse);
+            signResponse = '0x' + [...this.signResponse].map(x => x.toString(16).padStart(2, '0')).join('');
+            this.signResponse = undefined;
+/*            const keyManagementSystem: KeyManagementSystem = new KeyManagementSystem(this.privateKeyStore);
+            signResponse = await keyManagementSystem.sign(args);*/
+        } else if ('metakey' === args.keyRef?.kid) {
+            const keyManagementSystem: KeyManagementSystem = new KeyManagementSystem(this.privateKeyStore);
+            signResponse = await keyManagementSystem.sign(args);
         } else if (args.data) {
-            this.signKid = args.keyRef.kid;
+            this.signKid = args.keyRef?.kid;
             this.signAlgorithm = args.algorithm;
             this.signData = args.data;
-            let signResponse = '';
-            console.log("OurKeyManagementSystem.sign result: " + signResponse);
-            return Promise.resolve(signResponse);
+            signResponse = '';
+        } else {
+            throw new Error("Cannot sign with " + args.keyRef?.kid);
         }
-        throw "Not implemented: OurKeyManagementSystem.sign";
+        console.log("OurKeyManagementSystem.sign result: " + signResponse);
+        return Promise.resolve(signResponse);
     }
 }
 
@@ -180,7 +277,9 @@ class OurDIDStore extends AbstractDIDStore {
 
     async importDID(args: IIdentifier): Promise<boolean> {
         console.log("OurDIDStore.import args: " + JSON.stringify(args));
-        return Promise.resolve(false);
+        const result = false;
+        console.log("OurDIDStore.importDID result: " + JSON.stringify(result));
+        return Promise.resolve(result);
     }
 
     async getDID(args: { did: string; alias: string; provider: string }): Promise<IIdentifier> {

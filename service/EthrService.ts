@@ -23,9 +23,10 @@ export default {
                     return;
                 }
 
-                const methodOptions = requestUtils.determineMethodOptions(method, options);
+                const methodOptions = requestUtils.determineMethodOptions(method, 'create', options);
+                const methodNetwork = determineMethodNetwork(options);
 
-                const { agent } = await createEthrAgent('create', methodPublicKeyHex, undefined);
+                const { agent } = await createEthrAgent('create', methodNetwork, methodPublicKeyHex);
                 console.log('trying to create DID with agent: ' + agent);
                 await agent.didManagerCreate({
                     alias: 'default',
@@ -60,9 +61,10 @@ export default {
 
         return new Promise(async function (resolve, reject) {
             try {
-                const methodOptions = requestUtils.determineMethodOptions(method, options);
+                const methodOptions = requestUtils.determineMethodOptions(method, 'update', options);
+                const methodNetwork = determineMethodNetwork(options);
 
-                const { keyManagementSystem, agent } = await createEthrAgent('update', undefined, signingResponseSet);
+                const { keyManagementSystem, agent } = await createEthrAgent('update', methodNetwork, undefined);
                 console.log('trying to update DID ' + did + ' with operations ' + JSON.stringify(didDocumentOperations) + ' with agent: ' + agent);
 
                 let signingRequestSet: any = {};
@@ -72,22 +74,32 @@ export default {
                     const didDocument = didDocuments[i];
                     console.log('didDocumentOperation: ' + didDocumentOperation);
                     console.log('didDocument: ' + JSON.stringify(didDocument));
+
                     if (didDocumentOperation === 'addToDidDocument') {
-                        if (Array.isArray(didDocument.verificationMethod)) for (const didDocumentVerificationMethod of didDocument.verificationMethod) {
+
+                        /*
+                         * addToDidDocument - verificationMethod
+                         */
+
+                        if (Array.isArray(didDocument.verificationMethod)) for (const ii in didDocument.verificationMethod) {
+                            const didDocumentVerificationMethod = didDocument.verificationMethod[ii];
                             console.log('didDocumentVerificationMethod: ' + JSON.stringify(didDocumentVerificationMethod));
+
+                            const signingRequestId = 'signingRequestV' + ii;
+                            const signingResponse = signingResponseSet?.[signingRequestId];
+                            console.log('found signing response ' + signingRequestId + ': ' + JSON.stringify(signingResponse));
+                            if (signingResponse?.signature) {
+                                keyManagementSystem.signResponse = Buffer.from(signingResponse.signature, 'base64');
+                            }
+
                             let key: IKey = {
                                 kid: didDocumentVerificationMethod.id,
                                 kms: 'local',
                                 type: didDocumentVerificationMethod.type,
                                 publicKeyHex: didDocumentVerificationMethod.publicKeyHex
                             }
-                            const signingRequestId = 'signingRequestV' + i;
-                            const signingResponse = signingResponseSet?.[signingRequestId];
-                            console.log('found signing response ' + signingRequestId + ': ' + JSON.stringify(signingResponse));
-                            if (signingResponse?.signature) {
-                                keyManagementSystem.signResponse = Buffer.from(signingResponse.signature, 'base64');
-                            }
-                            console.log('trying to add key to did ' + did + ' with options ' + JSON.stringify(options) + ': ' + JSON.stringify(key));
+
+                            console.log('trying to add key to DID ' + did + ' with options ' + JSON.stringify(options) + ': ' + JSON.stringify(key));
                             await agent.didManagerAddKey({
                                 did: did,
                                 key: key,
@@ -95,10 +107,10 @@ export default {
                             }).then((identifier: any) => {
                                 console.log('successfully added key to DID: ' + JSON.stringify(identifier));
                             }).catch((e: any) => {
-                                if (e.reason.includes('signature missing') && ! signingResponse) {
+                                if (e.reason?.includes('signature missing') && ! signingResponse) {
                                     const signingRequest = responseUtils.signingRequest(method, keyManagementSystem.signKid, keyManagementSystem.signAlgorithm, keyManagementSystem.signData);
                                     signingRequestSet[signingRequestId] = signingRequest;
-                                    console.log('added signing request ' + signingRequestId + ': ' + JSON.stringify(signingRequest));
+                                    console.log('created signing request ' + signingRequestId + ': ' + JSON.stringify(signingRequest));
                                     return;
                                 }
                                 console.log('failed to add key to DID: ' + e.stack);
@@ -106,21 +118,30 @@ export default {
                                 return;
                             });
                         }
-                        if (Array.isArray(didDocument.service)) for (const didDocumentService of didDocument.service) {
+
+                        /*
+                         * addToDidDocument - service
+                         */
+
+                        if (Array.isArray(didDocument.service)) for (const ii in didDocument.service) {
+                            const didDocumentService = didDocument.service[ii];
                             console.log('didDocumentService: ' + JSON.stringify(didDocumentService));
+
+                            const signingRequestId = 'signingRequestS' + ii;
+                            const signingResponse = signingResponseSet?.[signingRequestId];
+                            console.log('found signing response ' + signingRequestId + ': ' + JSON.stringify(signingResponse));
+                            if (signingResponse?.signature) {
+                                keyManagementSystem.signResponse = Buffer.from(signingResponse.signature, 'base64');
+                            }
+
                             let didDocumentServiceEndpoint: IServiceEndpoint = didDocumentService.serviceEndpoint;
                             let service: IService = {
                                 id: didDocumentService.id,
                                 type: didDocumentService.type,
                                 serviceEndpoint: didDocumentServiceEndpoint
                             }
-                            const signingRequestId = 'signingRequestS' + i;
-                            const signingResponse = signingResponseSet?.[signingRequestId];
-                            console.log('found signing response ' + signingRequestId + ': ' + JSON.stringify(signingResponse));
-                            if (signingResponse?.signature) {
-                                keyManagementSystem.signResponse = Buffer.from(signingResponse.signature, 'base64');
-                            }
-                            console.log('trying to add service to did ' + did + ' with options ' + JSON.stringify(options) + ': ' + JSON.stringify(service));
+
+                            console.log('trying to add service to DID ' + did + ' with options ' + JSON.stringify(options) + ': ' + JSON.stringify(service));
                             await agent.didManagerAddService({
                                 did: did,
                                 service: service,
@@ -128,10 +149,10 @@ export default {
                             }).then((identifier: any) => {
                                 console.log('successfully added service to DID: ' + JSON.stringify(identifier));
                             }).catch((e: any) => {
-                                if (e.reason.includes('signature missing') && ! signingResponse) {
+                                if (e.reason?.includes('signature missing') && ! signingResponse) {
                                     const signingRequest = responseUtils.signingRequest(method, keyManagementSystem.signKid, keyManagementSystem.signAlgorithm, keyManagementSystem.signData);
                                     signingRequestSet[signingRequestId] = signingRequest;
-                                    console.log('added signing request ' + signingRequestId + ': ' + JSON.stringify(signingRequest));
+                                    console.log('created signing request ' + signingRequestId + ': ' + JSON.stringify(signingRequest));
                                     return;
                                 }
                                 console.log('failed to add service to DID: ' + e.stack);
@@ -140,7 +161,80 @@ export default {
                             });
                         }
                     } else if (didDocumentOperation === 'removeFromDidDocument') {
-                        throw "Missing or unsupported didDocumentOperation: " + didDocumentOperation;
+
+                        /*
+                         * removeFromDidDocument - verificationMethod
+                         */
+
+                        if (Array.isArray(didDocument.verificationMethod)) for (const ii in didDocument.verificationMethod) {
+                            const didDocumentVerificationMethod = didDocument.verificationMethod[ii];
+                            console.log('didDocumentVerificationMethod: ' + JSON.stringify(didDocumentVerificationMethod));
+
+                            const signingRequestId = 'signingRequestV' + ii;
+                            const signingResponse = signingResponseSet?.[signingRequestId];
+                            console.log('found signing response ' + signingRequestId + ': ' + JSON.stringify(signingResponse));
+                            if (signingResponse?.signature) {
+                                keyManagementSystem.signResponse = Buffer.from(signingResponse.signature, 'base64');
+                            }
+
+                            let id: string = didDocumentVerificationMethod.id;
+
+                            console.log('trying to remove key from DID ' + did + ' with options ' + JSON.stringify(options) + ': ' + id);
+                            await agent.didManagerRemoveKey({
+                                did: did,
+                                kid: id,
+                                options: methodOptions
+                            }).then((identifier: any) => {
+                                console.log('successfully removed key from DID: ' + JSON.stringify(identifier));
+                            }).catch((e: any) => {
+                                if (e.reason?.includes('signature missing') && ! signingResponse) {
+                                    const signingRequest = responseUtils.signingRequest(method, keyManagementSystem.signKid, keyManagementSystem.signAlgorithm, keyManagementSystem.signData);
+                                    signingRequestSet[signingRequestId] = signingRequest;
+                                    console.log('created signing request ' + signingRequestId + ': ' + JSON.stringify(signingRequest));
+                                    return;
+                                }
+                                console.log('failed to remove key from DID: ' + e.stack);
+                                resolve({code: 500, payload: '' + e});
+                                return;
+                            });
+                        }
+
+                        /*
+                         * removeFromDidDocument - service
+                         */
+
+                        if (Array.isArray(didDocument.service)) for (const ii in didDocument.service) {
+                            const didDocumentService = didDocument.service[ii];
+                            console.log('didDocumentService: ' + JSON.stringify(didDocumentService));
+
+                            const signingRequestId = 'signingRequestS' + ii;
+                            const signingResponse = signingResponseSet?.[signingRequestId];
+                            console.log('found signing response ' + signingRequestId + ': ' + JSON.stringify(signingResponse));
+                            if (signingResponse?.signature) {
+                                keyManagementSystem.signResponse = Buffer.from(signingResponse.signature, 'base64');
+                            }
+
+                            let id: string = didDocumentService.id;
+
+                            console.log('trying to remove service from DID ' + did + ' with options ' + JSON.stringify(options) + ': ' + id);
+                            await agent.didManagerRemoveService({
+                                did: did,
+                                id: id,
+                                options: methodOptions
+                            }).then((identifier: any) => {
+                                console.log('successfully removed service to DID: ' + JSON.stringify(identifier));
+                            }).catch((e: any) => {
+                                if (e.reason?.includes('signature missing') && ! signingResponse) {
+                                    const signingRequest = responseUtils.signingRequest(method, keyManagementSystem.signKid, keyManagementSystem.signAlgorithm, keyManagementSystem.signData);
+                                    signingRequestSet[signingRequestId] = signingRequest;
+                                    console.log('created signing request ' + signingRequestId + ': ' + JSON.stringify(signingRequest));
+                                    return;
+                                }
+                                console.log('failed to remove service from DID: ' + e.stack);
+                                resolve({code: 500, payload: '' + e});
+                                return;
+                            });
+                        }
                     } else {
                         throw "Missing or unsupported didDocumentOperation: " + didDocumentOperation;
                     }
@@ -169,4 +263,12 @@ export default {
             reject("Not implemented");
         });
     }
+}
+
+const determineMethodNetwork = function(options: any): any {
+
+    let methodNetwork = options.network;
+
+    console.log('methodNetwork: ' + methodNetwork);
+    return methodNetwork;
 }

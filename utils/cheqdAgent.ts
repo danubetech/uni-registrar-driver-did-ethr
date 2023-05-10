@@ -15,30 +15,32 @@ const cheqdNetworkCosmosPayerSeeds = process.env.uniregistrar_driver_veramo_cheq
 
 if (cheqdEnabled && (! cheqdNetworks || ! cheqdNetworkRpcUrls || ! cheqdNetworkCosmosPayerSeeds)) throw("Missing 'uniregistrar_driver_veramo_cheqdNetworks' or 'uniregistrar_driver_veramo_cheqdNetworkRpcUrls'  or 'uniregistrar_driver_veramo_cheqdNetworkCosmosPayerSeeds' variable.");
 
-export const createCheqdAgent = async function (operation: string, publicKeyHex: string, network: string) {
+export const createCheqdAgent = async function (operation: string, network: string, publicKeyHex?: string) {
 
     if (! cheqdEnabled) throw("'cheqd' not enabled.");
 
     const providers: Record<string, AbstractIdentifierProvider> = { };
+
     if (cheqdEnabled && cheqdNetworks && cheqdNetworkRpcUrls && cheqdNetworkCosmosPayerSeeds) {
         const cheqdNetworksList = cheqdNetworks?.split(";");
         const cheqdNetworkRpcUrlsList = cheqdNetworkRpcUrls?.split(";");
         const cheqdNetworkCosmosPayerSeedsList = cheqdNetworkCosmosPayerSeeds?.split(";");
         for (var i=0; i<cheqdNetworksList.length; i++) {
-            const network = cheqdNetworksList[i];
-            const rpcUrl = cheqdNetworkRpcUrlsList[i];
-            const cosmosPayerSeed = cheqdNetworkCosmosPayerSeedsList[i];
+            if (network !== cheqdNetworksList[i]) continue;
+            const cheqdNetwork = cheqdNetworksList[i];
+            const cheqdNetworkRpcUrl = cheqdNetworkRpcUrlsList[i];
+            const cheqdNetworkCosmosPayerSeed = cheqdNetworkCosmosPayerSeedsList[i];
             var networkType;
-            if (network === 'mainnet') networkType = NetworkType.Mainnet;
-            else if (network === 'testnet') networkType = NetworkType.Testnet;
-            else throw ("Unknown did:cheqd network: " + network);
-            providers['did:cheqd' + ':' + network] = new CheqdDIDProvider({
+            if (cheqdNetwork === 'mainnet') networkType = NetworkType.Mainnet;
+            else if (cheqdNetwork === 'testnet') networkType = NetworkType.Testnet;
+            else throw ("Unknown did:cheqd network: " + cheqdNetwork);
+            providers['did:cheqd' + ':' + cheqdNetwork] = new CheqdDIDProvider({
                 defaultKms: 'local',
                 networkType: networkType,
-                rpcUrl: rpcUrl,
-                cosmosPayerSeed: cosmosPayerSeed
+                rpcUrl: cheqdNetworkRpcUrl,
+                cosmosPayerSeed: cheqdNetworkCosmosPayerSeed
             });
-            console.log("Added 'did:cheqd:" + network + "' provider.");
+            console.log("Added 'did:cheqd:" + cheqdNetwork + "' provider.");
         }
     }
 
@@ -95,13 +97,15 @@ class OurKeyStore extends AbstractKeyStore {
             type: 'Ed25519',
             publicKeyHex: ''
         };
-        console.log("OutKeyStore.getKey result: " + JSON.stringify(key));
+        console.log("OurKeyStore.getKey result: " + JSON.stringify(key));
         return Promise.resolve(key);
     }
 
     async importKey(args: Partial<IKey>): Promise<boolean> {
         console.log("OurKeyStore.importKey args: " + JSON.stringify(args));
-        return Promise.resolve(false);
+        const result = false;
+        console.log("OurKeyStore.importKey result: " + JSON.stringify(result));
+        return Promise.resolve(result);
     }
 
     async listKeys(args: {}): Promise<Array<ManagedKeyInfo>> {
@@ -173,7 +177,9 @@ class OurDIDStore extends AbstractDIDStore {
 
     async importDID(args: IIdentifier): Promise<boolean> {
         console.log("OurDIDStore.import args: " + JSON.stringify(args));
-        return Promise.resolve(false);
+        const result = false;
+        console.log("OurDIDStore.importDID result: " + JSON.stringify(result));
+        return Promise.resolve(result);
     }
 
     async getDID(args: { did: string; alias: string; provider: string }): Promise<IIdentifier> {
