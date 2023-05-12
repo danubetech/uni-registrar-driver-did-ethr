@@ -26,9 +26,12 @@ export default {
                 const methodOptions = requestUtils.determineMethodOptions(method, 'create', options);
                 const methodNetwork = determineMethodNetwork(options);
 
-                const { agent } = await createEthrAgent('create', methodNetwork, methodPublicKeyHex);
+                const { keyManagementSystem, agent } = await createEthrAgent('create', methodNetwork, methodPublicKeyHex);
                 console.log('trying to create DID with agent: ' + agent);
-                await agent.didManagerCreate({
+
+                let promises = [];
+
+                promises.push(agent.didManagerCreate({
                     alias: 'default',
                     options: methodOptions
                 }).then((identifier: any) => {
@@ -36,13 +39,18 @@ export default {
                     const did = identifier.did;
                     console.log("did: " + did);
                     const response = responseUtils.finishedResponse(method, did);
-                    resolve(response);
-                    return;
+                    return response;
                 }).catch((e: any) => {
                     console.log('failed to create DID: ' + e.stack);
-                    resolve({code: 500, payload: '' + e});
+                    return {code: 500, payload: '' + e};
+                }));
+
+                const promisesResults = (await Promise.all(promises)).filter(e => e);
+                console.log('results: ' + JSON.stringify(promisesResults));
+                if (promisesResults.length > 0) {
+                    resolve(promisesResults[0]);
                     return;
-                });
+                }
             } catch (e: any) {
                 console.log("ERROR: " + e);
                 resolve({code: 500, payload: '' + e});
@@ -67,6 +75,7 @@ export default {
                 const { keyManagementSystem, agent } = await createEthrAgent('update', methodNetwork, undefined);
                 console.log('trying to update DID ' + did + ' with operations ' + JSON.stringify(didDocumentOperations) + ' with agent: ' + agent);
 
+                let promises = [];
                 let signingRequestSet: any = {};
 
                 for (const i in didDocumentOperations) {
@@ -100,7 +109,7 @@ export default {
                             }
 
                             console.log('trying to add key to DID ' + did + ' with options ' + JSON.stringify(options) + ': ' + JSON.stringify(key));
-                            await agent.didManagerAddKey({
+                            promises.push(agent.didManagerAddKey({
                                 did: did,
                                 key: key,
                                 options: methodOptions
@@ -114,9 +123,8 @@ export default {
                                     return;
                                 }
                                 console.log('failed to add key to DID: ' + e.stack);
-                                resolve({code: 500, payload: '' + e});
-                                return;
-                            });
+                                return {code: 500, payload: '' + e};
+                            }));
                         }
 
                         /*
@@ -142,7 +150,7 @@ export default {
                             }
 
                             console.log('trying to add service to DID ' + did + ' with options ' + JSON.stringify(options) + ': ' + JSON.stringify(service));
-                            await agent.didManagerAddService({
+                            promises.push(agent.didManagerAddService({
                                 did: did,
                                 service: service,
                                 options: methodOptions
@@ -156,9 +164,8 @@ export default {
                                     return;
                                 }
                                 console.log('failed to add service to DID: ' + e.stack);
-                                resolve({code: 500, payload: '' + e});
-                                return;
-                            });
+                                return {code: 500, payload: '' + e};
+                            }));
                         }
                     } else if (didDocumentOperation === 'removeFromDidDocument') {
 
@@ -180,7 +187,7 @@ export default {
                             let id: string = didDocumentVerificationMethod.id;
 
                             console.log('trying to remove key from DID ' + did + ' with options ' + JSON.stringify(options) + ': ' + id);
-                            await agent.didManagerRemoveKey({
+                            promises.push(agent.didManagerRemoveKey({
                                 did: did,
                                 kid: id,
                                 options: methodOptions
@@ -194,9 +201,8 @@ export default {
                                     return;
                                 }
                                 console.log('failed to remove key from DID: ' + e.stack);
-                                resolve({code: 500, payload: '' + e});
-                                return;
-                            });
+                                return {code: 500, payload: '' + e};
+                            }));
                         }
 
                         /*
@@ -217,7 +223,7 @@ export default {
                             let id: string = didDocumentService.id;
 
                             console.log('trying to remove service from DID ' + did + ' with options ' + JSON.stringify(options) + ': ' + id);
-                            await agent.didManagerRemoveService({
+                            promises.push(agent.didManagerRemoveService({
                                 did: did,
                                 id: id,
                                 options: methodOptions
@@ -231,13 +237,19 @@ export default {
                                     return;
                                 }
                                 console.log('failed to remove service from DID: ' + e.stack);
-                                resolve({code: 500, payload: '' + e});
-                                return;
-                            });
+                                return {code: 500, payload: '' + e};
+                            }));
                         }
                     } else {
                         throw "Missing or unsupported didDocumentOperation: " + didDocumentOperation;
                     }
+                }
+
+                const promisesResults = (await Promise.all(promises)).filter(e => e);
+                console.log('results: ' + JSON.stringify(promisesResults));
+                if (promisesResults.length > 0) {
+                    resolve(promisesResults[0]);
+                    return;
                 }
 
                 if (Object.keys(signingRequestSet).length > 0) {
