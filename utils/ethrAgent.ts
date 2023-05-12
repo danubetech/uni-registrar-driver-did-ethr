@@ -8,7 +8,6 @@ import {NetworkType} from '@cheqd/did-provider-cheqd/did-manager/cheqd-did-provi
 import {AbstractKeyManagementSystem, AbstractKeyStore, AbstractPrivateKeyStore, KeyManager} from '@veramo/key-manager';
 import {EthrNetworkConfiguration} from "@veramo/did-provider-ethr/src/ethr-did-provider";
 import {JsonRpcProvider} from "@ethersproject/providers";
-import {Wallet} from "@ethersproject/wallet";
 import {KeyManagementSystem} from "@veramo/kms-local";
 import {ImportablePrivateKey, ManagedPrivateKey} from "@veramo/key-manager";
 
@@ -42,7 +41,6 @@ export const createEthrAgent = async function (operation: string, network: strin
             const ethrNetworkMetaPrivateKey = ethrNetworkMetaPrivateKeysList[i];
             const ethrNetworkMetaPublicKey = ethrNetworkMetaPublicKeysList[i];
             const provider: JsonRpcProvider = new JsonRpcProvider(ethrNetworkRpcUrl, ethrNetwork);
-            const wallet: Wallet = new Wallet(ethrNetworkMetaPrivateKey, provider);
             const ethrNetworkConfiguration: EthrNetworkConfiguration = {
                 name: ethrNetwork,
                 provider: provider
@@ -267,6 +265,7 @@ class OurKeyManagementSystem extends AbstractKeyManagementSystem {
 class OurDIDStore extends AbstractDIDStore {
     private readonly provider: string
     private readonly operation: string
+    public didDocument?: any
 
     constructor(provider: string, operation: string) {
         super();
@@ -294,6 +293,8 @@ class OurDIDStore extends AbstractDIDStore {
                 keys: [],
                 services: []
             };
+            if (this.didDocument?.verificationMethod) identifier.keys = this.didDocument.verificationMethod;
+            if (this.didDocument?.service) identifier.services = this.didDocument.service;
             console.log("OurDIDStore.getDID result: " + JSON.stringify(identifier));
             return Promise.resolve(identifier);
         }

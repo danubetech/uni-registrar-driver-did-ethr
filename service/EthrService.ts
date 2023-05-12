@@ -26,7 +26,7 @@ export default {
                 const methodOptions = requestUtils.determineMethodOptions(method, 'create', options);
                 const methodNetwork = determineMethodNetwork(options);
 
-                const { keyManagementSystem, agent } = await createEthrAgent('create', methodNetwork, methodPublicKeyHex);
+                const { agent } = await createEthrAgent('create', methodNetwork, methodPublicKeyHex);
                 console.log('trying to create DID with agent: ' + agent);
 
                 let promises = [];
@@ -72,8 +72,7 @@ export default {
                 const methodOptions = requestUtils.determineMethodOptions(method, 'update', options);
                 const methodNetwork = determineMethodNetwork(options);
 
-                const { keyManagementSystem, agent } = await createEthrAgent('update', methodNetwork, undefined);
-                console.log('trying to update DID ' + did + ' with operations ' + JSON.stringify(didDocumentOperations) + ' with agent: ' + agent);
+                console.log('trying to update DID ' + did + ' with options ' + JSON.stringify(methodOptions) + ' with operations ' + JSON.stringify(didDocumentOperations));
 
                 let promises = [];
                 let signingRequestSet: any = {};
@@ -81,8 +80,8 @@ export default {
                 for (const i in didDocumentOperations) {
                     const didDocumentOperation = didDocumentOperations[i];
                     const didDocument = didDocuments[i];
-                    console.log('didDocumentOperation: ' + didDocumentOperation);
-                    console.log('didDocument: ' + JSON.stringify(didDocument));
+                    console.log('didDocumentOperation ' + i + ': ' + didDocumentOperation);
+                    console.log('didDocument ' + i + ': ' + JSON.stringify(didDocument));
 
                     if (didDocumentOperation === 'addToDidDocument') {
 
@@ -93,6 +92,9 @@ export default {
                         if (Array.isArray(didDocument.verificationMethod)) for (const ii in didDocument.verificationMethod) {
                             const didDocumentVerificationMethod = didDocument.verificationMethod[ii];
                             console.log('didDocumentVerificationMethod: ' + JSON.stringify(didDocumentVerificationMethod));
+
+                            const { didStore, keyManagementSystem, agent } = await createEthrAgent('update', methodNetwork, undefined);
+                            didStore.didDocument = { };
 
                             const signingRequestId = 'signingRequestV' + ii;
                             const signingResponse = signingResponseSet?.[signingRequestId];
@@ -134,6 +136,9 @@ export default {
                         if (Array.isArray(didDocument.service)) for (const ii in didDocument.service) {
                             const didDocumentService = didDocument.service[ii];
                             console.log('didDocumentService: ' + JSON.stringify(didDocumentService));
+
+                            const { didStore, keyManagementSystem, agent } = await createEthrAgent('update', methodNetwork, undefined);
+                            didStore.didDocument = { };
 
                             const signingRequestId = 'signingRequestS' + ii;
                             const signingResponse = signingResponseSet?.[signingRequestId];
@@ -177,6 +182,9 @@ export default {
                             const didDocumentVerificationMethod = didDocument.verificationMethod[ii];
                             console.log('didDocumentVerificationMethod: ' + JSON.stringify(didDocumentVerificationMethod));
 
+                            const { didStore, keyManagementSystem, agent } = await createEthrAgent('update', methodNetwork, undefined);
+                            didStore.didDocument = didDocument;
+
                             const signingRequestId = 'signingRequestV' + ii;
                             const signingResponse = signingResponseSet?.[signingRequestId];
                             console.log('found signing response ' + signingRequestId + ': ' + JSON.stringify(signingResponse));
@@ -213,6 +221,9 @@ export default {
                             const didDocumentService = didDocument.service[ii];
                             console.log('didDocumentService: ' + JSON.stringify(didDocumentService));
 
+                            const { didStore, keyManagementSystem, agent } = await createEthrAgent('update', methodNetwork, undefined);
+                            didStore.didDocument = didDocument;
+
                             const signingRequestId = 'signingRequestS' + ii;
                             const signingResponse = signingResponseSet?.[signingRequestId];
                             console.log('found signing response ' + signingRequestId + ': ' + JSON.stringify(signingResponse));
@@ -228,7 +239,7 @@ export default {
                                 id: id,
                                 options: methodOptions
                             }).then((identifier: any) => {
-                                console.log('successfully removed service to DID: ' + JSON.stringify(identifier));
+                                console.log('successfully removed service from DID: ' + JSON.stringify(identifier));
                             }).catch((e: any) => {
                                 if (e.reason?.includes('signature missing') && ! signingResponse) {
                                     const signingRequest = responseUtils.signingRequest(method, keyManagementSystem.signKid, keyManagementSystem.signAlgorithm, keyManagementSystem.signData);
