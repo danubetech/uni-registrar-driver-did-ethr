@@ -1,5 +1,3 @@
-![DIF Logo](https://raw.githubusercontent.com/decentralized-identity/universal-registrar/master/docs/logo-dif.png)
-
 # Universal Registrar Driver: veramo
 
 This is a [Universal Registrar](https://github.com/decentralized-identity/universal-registrar/) driver for identifiers supported by Veramo.
