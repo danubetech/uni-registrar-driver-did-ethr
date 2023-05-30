@@ -1,5 +1,5 @@
 {
-  "name": "danubetech-uni-registrar-veramo",
+  "name": "uni-registrar-danubetech-driver-veramo",
   "version": "0.2.0",
   "main": "index.ts",
   "type": "module",
