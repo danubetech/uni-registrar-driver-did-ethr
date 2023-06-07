@@ -1,6 +1,6 @@
-# Universal Registrar Driver: veramo
+# Universal Registrar Driver: did:ethr
 
-This is a [Universal Registrar](https://github.com/decentralized-identity/universal-registrar/) driver for identifiers supported by Veramo.
+This is a [Universal Registrar](https://github.com/decentralized-identity/universal-registrar/) driver for **did:ethr** identifiers.
 
 ## Specifications
 
@@ -10,8 +10,8 @@ This is a [Universal Registrar](https://github.com/decentralized-identity/univer
 ## Build and Run (Docker)
 
 ```
-docker build -f ./docker/Dockerfile . -t universalregistrar/danubetech-driver-veramo
-docker run -p 9080:9080 universalregistrar/danubetech-driver-veramo
+docker build -f ./docker/Dockerfile . -t universalregistrar/driver-did-ethr
+docker run -p 9080:9080 universalregistrar/driver-did-ethr
 ```
 
 ## Driver Environment Variables
@@ -26,14 +26,18 @@ docker run -p 9080:9080 universalregistrar/danubetech-driver-veramo
 
 ```
 {
-    "keyType": "ed25519"
+    "network": "goerli"
 }
 ```
 
-* `keyType`: The type of key to generate. Values: `ed25519`, `secp256k1`
+* `network`: The network where the DID operation should take place. Values: `mainnet`, `goerli`, `sepolia`
 
 ## Driver Output Metadata
 
 ```
 (none)
 ```
+
+## About
+
+Danube Tech - https://danubetech.com/
