@@ -12,16 +12,6 @@ export default {
             if ("EcdsaSecp256k1VerificationKey2019" !== didDocument?.verificationMethod[0]?.type) throw "Verification method must be of type 'EcdsaSecp256k1VerificationKey2019'";
             if (! didDocument.verificationMethod[0].publicKeyHex) throw "Verification method must have property 'publicKeyHex'";
             publicKeyHex = didDocument.verificationMethod[0].publicKeyHex;
-        } else if ('did:pkh' === method) {
-            if ("#blockchainAccountIdKey" !== didDocument?.verificationMethod[0]?.id) throw "DID document must have exactly one verification method with id '#blockchainAccountIdKey'.";
-            if ("EcdsaSecp256k1VerificationKey2019" !== didDocument?.verificationMethod[0]?.type) throw "Verification method must be of type 'EcdsaSecp256k1VerificationKey2019'";
-            if (! didDocument.verificationMethod[0].publicKeyHex) throw "Verification method must have property 'publicKeyHex'";
-            publicKeyHex = didDocument.verificationMethod[0].publicKeyHex;
-        } else if ('did:cheqd' === method) {
-            if ("#key1" !== didDocument?.verificationMethod[0]?.id) throw "DID document must have exactly one verification method with id '#key1'.";
-            if ("Ed25519VerificationKey2020" !== didDocument?.verificationMethod[0]?.type) throw "Verification method must be of type 'Ed25519VerificationKey2020'";
-            if (! didDocument.verificationMethod[0].publicKeyMultibase) throw "Verification method must have property 'publicKeyMultibase'";
-            publicKeyHex = didDocument.verificationMethod[0].publicKeyMultibase;
         } else {
             throw 'Unsupported method (validateDidDocument): ' + method;
         }
@@ -42,18 +32,6 @@ export default {
                 }
             }
             methodOptions['metaIdentifierKeyId'] = 'metakey';
-        } else if ('did:pkh' === method) {
-            methodOptions = { };
-            if (options.chainId) {
-                methodOptions['chainId'] = options['chainId'];
-            } else if (options.network) {
-                methodOptions['chainId'] = options['network'];
-            }
-        } else if ('did:cheqd' === method) {
-            methodOptions = { };
-            if (options.network) {
-                methodOptions['network'] = options['network'];
-            }
         } else {
             throw 'Unsupported method (methodOptions): ' + method;
         }

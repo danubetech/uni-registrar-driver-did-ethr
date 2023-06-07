@@ -4,21 +4,20 @@ import type {AbstractIdentifierProvider} from '@veramo/did-manager';
 import {AbstractDIDStore, DIDManager} from '@veramo/did-manager';
 import {EthrDIDProvider} from '@veramo/did-provider-ethr';
 // @ts-ignore
-import {NetworkType} from '@cheqd/did-provider-cheqd/did-manager/cheqd-did-provider';
 import {AbstractKeyManagementSystem, AbstractKeyStore, AbstractPrivateKeyStore, KeyManager} from '@veramo/key-manager';
 import {EthrNetworkConfiguration} from "@veramo/did-provider-ethr/src/ethr-did-provider";
 import {JsonRpcProvider} from "@ethersproject/providers";
 import {KeyManagementSystem} from "@veramo/kms-local";
 import {ImportablePrivateKey, ManagedPrivateKey} from "@veramo/key-manager";
 
-const ethrEnabled = process.env.uniregistrar_driver_veramo_ethrEnabled || 'true';
+const ethrEnabled = process.env.uniregistrar_driver_did_ethr_ethrEnabled || 'true';
 
-const ethrNetworks = process.env.uniregistrar_driver_veramo_ethrNetworks;
-const ethrNetworkRpcUrls = process.env.uniregistrar_driver_veramo_ethrNetworkRpcUrls;
-const ethrNetworkMetaPrivateKeys = process.env.uniregistrar_driver_veramo_ethrNetworkMetaPrivateKeys;
-const ethrNetworkMetaPublicKeys = process.env.uniregistrar_driver_veramo_ethrNetworkMetaPublicKeys;
+const ethrNetworks = process.env.uniregistrar_driver_did_ethr_ethrNetworks;
+const ethrNetworkRpcUrls = process.env.uniregistrar_driver_did_ethr_ethrNetworkRpcUrls;
+const ethrNetworkMetaPrivateKeys = process.env.uniregistrar_driver_did_ethr_ethrNetworkMetaPrivateKeys;
+const ethrNetworkMetaPublicKeys = process.env.uniregistrar_driver_did_ethr_ethrNetworkMetaPublicKeys;
 
-if (ethrEnabled && (! ethrNetworks || ! ethrNetworkRpcUrls || ! ethrNetworkMetaPrivateKeys || ! ethrNetworkMetaPublicKeys)) throw("Missing 'uniregistrar_driver_veramo_ethrNetworks' or 'uniregistrar_driver_veramo_ethrNetworkRpcUrls' or 'uniregistrar_driver_veramo_ethrNetworkMetaPrivateKeys' or 'uniregistrar_driver_veramo_ethrNetworkMetaPublicKeys' variable.");
+if (ethrEnabled && (! ethrNetworks || ! ethrNetworkRpcUrls || ! ethrNetworkMetaPrivateKeys || ! ethrNetworkMetaPublicKeys)) throw("Missing 'uniregistrar_driver_did_ethr_ethrNetworks' or 'uniregistrar_driver_did_ethr_ethrNetworkRpcUrls' or 'uniregistrar_driver_did_ethr_ethrNetworkMetaPrivateKeys' or 'uniregistrar_driver_did_ethr_ethrNetworkMetaPublicKeys' variable.");
 
 export const createEthrAgent = async function (operation: string, network: string, publicKeyHex?: string) {
 
