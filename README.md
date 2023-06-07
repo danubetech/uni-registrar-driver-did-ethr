@@ -5,6 +5,7 @@ This is a [Universal Registrar](https://github.com/decentralized-identity/univer
 ## Specifications
 
 * [Decentralized Identifiers](https://w3c.github.io/did-core/)
+* [DID Registration](https://identity.foundation/did-registration/)
 * [Veramo](https://veramo.io/docs/)
 
 ## Build and Run (Docker)
