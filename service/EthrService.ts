@@ -24,7 +24,7 @@ export default {
                 }
 
                 const methodOptions = requestUtils.determineMethodOptions(method, 'create', options);
-                const methodNetwork = determineMethodNetwork(options);
+                const methodNetwork = determineMethodNetworkByOptions(options);
 
                 const { agent } = await createEthrAgent('create', methodNetwork, methodPublicKeyHex);
                 console.log('trying to create DID with agent: ' + agent);
@@ -70,7 +70,7 @@ export default {
         return new Promise(async function (resolve, reject) {
             try {
                 const methodOptions = requestUtils.determineMethodOptions(method, 'update', options);
-                const methodNetwork = determineMethodNetwork(options);
+                const methodNetwork = determineMethodNetworkByDid(did);
 
                 console.log('trying to update DID ' + did + ' with options ' + JSON.stringify(methodOptions) + ' with operations ' + JSON.stringify(didDocumentOperations));
 
@@ -288,9 +288,20 @@ export default {
     }
 }
 
-const determineMethodNetwork = function(options: any): any {
+const determineMethodNetworkByOptions = function(options: any): any {
 
     let methodNetwork = options.network;
+
+    console.log('methodNetwork: ' + methodNetwork);
+    return methodNetwork;
+}
+
+const determineMethodNetworkByDid = function(did: string): any {
+
+    const networkStringMatcher = /^did:ethr(:.+)?:(0x[0-9a-fA-F]{40}|0x[0-9a-fA-F]{66}).*$/;
+    const matches = did.match(networkStringMatcher);
+
+    let methodNetwork = matches?.[1]?.substring(1);
 
     console.log('methodNetwork: ' + methodNetwork);
     return methodNetwork;
