@@ -169,9 +169,8 @@ class OurPrivateKeyStore extends AbstractPrivateKeyStore {
             key = {
                 alias: args.alias,
                 type: 'Secp256k1',
-                privateKeyHex: 'f85035541e7a120eb74810710fcf40d694473d868ec4ab2b06c79fcb620a6c5b'
+                privateKeyHex: '0000000000000000000000000000000000000000000000000000000000000000'
             };
-//            throw new Error("Private key " + args.alias + " not available.");
         }
         console.log("OurPrivateKeyStore.getKey result: " + JSON.stringify(key));
         return Promise.resolve(key);
