@@ -1,0 +1,129 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0,0,800,500" preserveAspectRatio="xMidYMid meet">
+    <line class="grid-line" x1="81" y1="420" x2="770" y2="420" fill="none" stroke="#64748b" stroke-opacity="0.1">
+    </line>
+    <g class="x-primary" transform="translate(0,420)" fill="none" font-size="10" font-family="sans-serif"
+        text-anchor="middle" style="font-size: 23px; color: #1e293b;">
+        <path class="domain" stroke="currentColor" d="M80.5,10V0.5H770.5V10"></path>
+        <g class="tick" opacity="1" transform="translate(126.10344696044922, 0)">
+            <line stroke="currentColor" y2="10"></line><text fill="currentColor" y="25" dy="0.71em">25</text>
+        </g>
+        <g class="tick" opacity="1" transform="translate(173.6896514892578, 0)">
+            <line stroke="currentColor" y2="10"></line><text fill="currentColor" y="25" dy="0.71em">27</text>
+        </g>
+        <g class="tick" opacity="1" transform="translate(221.27586364746094, 0)">
+            <line stroke="currentColor" y2="10"></line><text fill="currentColor" y="25" dy="0.71em">29</text>
+        </g>
+        <g class="tick" opacity="1" transform="translate(268.862060546875, 0)">
+            <line stroke="currentColor" y2="10"></line><text fill="currentColor" y="25" dy="0.71em">31</text>
+        </g>
+        <g class="tick" opacity="1" transform="translate(292.6551818847656, 0)">
+            <line stroke="currentColor" y2="10"></line><text fill="currentColor" y="25" dy="0.71em">1</text>
+        </g>
+        <g class="tick" opacity="1" transform="translate(340.24139404296875, 0)">
+            <line stroke="currentColor" y2="10"></line><text fill="currentColor" y="25" dy="0.71em">3</text>
+        </g>
+        <g class="tick" opacity="1" transform="translate(387.82757568359375, 0)">
+            <line stroke="currentColor" y2="10"></line><text fill="currentColor" y="25" dy="0.71em">5</text>
+        </g>
+        <g class="tick" opacity="1" transform="translate(435.4137878417969, 0)">
+            <line stroke="currentColor" y2="10"></line><text fill="currentColor" y="25" dy="0.71em">7</text>
+        </g>
+        <g class="tick" opacity="1" transform="translate(483, 0)">
+            <line stroke="currentColor" y2="10"></line><text fill="currentColor" y="25" dy="0.71em">9</text>
+        </g>
+        <g class="tick" opacity="1" transform="translate(530.586181640625, 0)">
+            <line stroke="currentColor" y2="10"></line><text fill="currentColor" y="25" dy="0.71em">11</text>
+        </g>
+        <g class="tick" opacity="1" transform="translate(578.1724243164062, 0)">
+            <line stroke="currentColor" y2="10"></line><text fill="currentColor" y="25" dy="0.71em">13</text>
+        </g>
+        <g class="tick" opacity="1" transform="translate(625.7586059570312, 0)">
+            <line stroke="currentColor" y2="10"></line><text fill="currentColor" y="25" dy="0.71em">15</text>
+        </g>
+        <g class="tick" opacity="1" transform="translate(673.3448486328125, 0)">
+            <line stroke="currentColor" y2="10"></line><text fill="currentColor" y="25" dy="0.71em">17</text>
+        </g>
+        <g class="tick" opacity="1" transform="translate(720.9310302734375, 0)">
+            <line stroke="currentColor" y2="10"></line><text fill="currentColor" y="25" dy="0.71em">19</text>
+        </g>
+        <g class="tick" opacity="1" transform="translate(768.5172119140625, 0)">
+            <line stroke="currentColor" y2="10"></line><text fill="currentColor" y="25" dy="0.71em">21</text>
+        </g>
+    </g>
+    <g class="x-secondary" transform="translate(0,470)" fill="none" font-size="10" font-family="sans-serif"
+        text-anchor="middle" style="font-size: 23px; color: #1e293b;">
+        <g class="tick" opacity="1" transform="translate(268.862060546875, 0)">
+            <line stroke="currentColor" y2="20"></line><text fill="currentColor" y="35" dy="0.71em"
+                transform="translate(-5, -33)" style="text-anchor: end;">May</text>
+        </g>
+    </g>
+    <g class="y-axis" transform="translate(80,0)" fill="none" font-size="10" font-family="sans-serif" text-anchor="end"
+        style="font-size: 23px; color: #1e293b;">
+        <g class="tick" opacity="1" transform="translate(0, 420.5)">
+            <line stroke="currentColor" x2="-6"></line><text fill="currentColor" x="-9" dy="0.32em">2.2k</text>
+        </g>
+        <g class="tick" opacity="1" transform="translate(0, 383.2272644042969)">
+            <line stroke="currentColor" x2="-6"></line><text fill="currentColor" x="-9" dy="0.32em">2.4k</text>
+        </g>
+        <g class="tick" opacity="1" transform="translate(0, 345.9545593261719)">
+            <line stroke="currentColor" x2="-6"></line><text fill="currentColor" x="-9" dy="0.32em">2.6k</text>
+        </g>
+        <g class="tick" opacity="1" transform="translate(0, 308.68182373046875)">
+            <line stroke="currentColor" x2="-6"></line><text fill="currentColor" x="-9" dy="0.32em">2.8k</text>
+        </g>
+        <g class="tick" opacity="1" transform="translate(0, 271.4090881347656)">
+            <line stroke="currentColor" x2="-6"></line><text fill="currentColor" x="-9" dy="0.32em">3.0k</text>
+        </g>
+        <g class="tick" opacity="1" transform="translate(0, 234.13636779785156)">
+            <line stroke="currentColor" x2="-6"></line><text fill="currentColor" x="-9" dy="0.32em">3.2k</text>
+        </g>
+        <g class="tick" opacity="1" transform="translate(0, 196.86363220214844)">
+            <line stroke="currentColor" x2="-6"></line><text fill="currentColor" x="-9" dy="0.32em">3.4k</text>
+        </g>
+        <g class="tick" opacity="1" transform="translate(0, 159.59091186523438)">
+            <line stroke="currentColor" x2="-6"></line><text fill="currentColor" x="-9" dy="0.32em">3.6k</text>
+        </g>
+        <g class="tick" opacity="1" transform="translate(0, 122.31818389892578)">
+            <line stroke="currentColor" x2="-6"></line><text fill="currentColor" x="-9" dy="0.32em">3.8k</text>
+        </g>
+        <g class="tick" opacity="1" transform="translate(0, 85.04545593261719)">
+            <line stroke="currentColor" x2="-6"></line><text fill="currentColor" x="-9" dy="0.32em">4.0k</text>
+        </g>
+        <g class="tick" opacity="1" transform="translate(0, 47.772727966308594)">
+            <line stroke="currentColor" x2="-6"></line><text fill="currentColor" x="-9" dy="0.32em">4.2k</text>
+        </g>
+        <g class="tick" opacity="1" transform="translate(0, 10.5)">
+            <line stroke="currentColor" x2="-6"></line><text fill="currentColor" x="-9" dy="0.32em">4.4k</text>
+        </g>
+    </g>
+    <line class="grid-line" x1="81" y1="383.22727272727275" x2="770" y2="383.22727272727275" fill="none"
+        stroke="#64748b" stroke-opacity="0.1"></line>
+    <line class="grid-line" x1="81" y1="345.95454545454544" x2="770" y2="345.95454545454544" fill="none"
+        stroke="#64748b" stroke-opacity="0.1"></line>
+    <line class="grid-line" x1="81" y1="308.6818181818182" x2="770" y2="308.6818181818182" fill="none" stroke="#64748b"
+        stroke-opacity="0.1"></line>
+    <line class="grid-line" x1="81" y1="271.4090909090909" x2="770" y2="271.4090909090909" fill="none" stroke="#64748b"
+        stroke-opacity="0.1"></line>
+    <line class="grid-line" x1="81" y1="234.1363636363636" x2="770" y2="234.1363636363636" fill="none" stroke="#64748b"
+        stroke-opacity="0.1"></line>
+    <line class="grid-line" x1="81" y1="196.8636363636364" x2="770" y2="196.8636363636364" fill="none" stroke="#64748b"
+        stroke-opacity="0.1"></line>
+    <line class="grid-line" x1="81" y1="159.5909090909091" x2="770" y2="159.5909090909091" fill="none" stroke="#64748b"
+        stroke-opacity="0.1"></line>
+    <line class="grid-line" x1="81" y1="122.31818181818181" x2="770" y2="122.31818181818181" fill="none"
+        stroke="#64748b" stroke-opacity="0.1"></line>
+    <line class="grid-line" x1="81" y1="85.04545454545453" x2="770" y2="85.04545454545453" fill="none" stroke="#64748b"
+        stroke-opacity="0.1"></line>
+    <line class="grid-line" x1="81" y1="47.77272727272728" x2="770" y2="47.77272727272728" fill="none" stroke="#64748b"
+        stroke-opacity="0.1"></line>
+    <line class="grid-line" x1="81" y1="10.5" x2="770" y2="10.5" fill="none" stroke="#64748b" stroke-opacity="0.1">
+    </line>
+
+    <text x="100" y="60" text-anchor="start" fill="#4338ca" font-family="monospace" font-size="20">
+        ethr-mainnet
+    </text>
+    <path
+        d="M80,23.418181818181814C87.93103448275862,23.418181818181814,95.86206896551724,23.418181818181814,103.79310344827586,23.418181818181814C111.72413793103448,23.418181818181814,119.6551724137931,23.418181818181814,127.58620689655172,23.418181818181814C135.51724137931032,23.418181818181814,143.44827586206895,23.418181818181814,151.37931034482756,23.418181818181814C159.3103448275862,23.418181818181814,167.2413793103448,23.418181818181814,175.17241379310343,23.418181818181814C183.10344827586206,23.418181818181814,191.03448275862067,23.418181818181814,198.9655172413793,23.418181818181814C206.89655172413794,23.418181818181814,214.82758620689654,23.418181818181814,222.75862068965517,23.418181818181814C230.6896551724138,23.418181818181814,238.6206896551724,23.418181818181814,246.55172413793105,23.418181818181814C254.48275862068968,23.418181818181814,262.4137931034483,23.418181818181814,270.3448275862069,23.418181818181814C278.2758620689655,23.418181818181814,286.2068965517242,23.418181818181814,294.1379310344828,23.418181818181814C302.0689655172414,23.418181818181814,310,23.418181818181814,317.9310344827586,23.418181818181814C325.8620689655172,23.418181818181814,333.7931034482758,23.418181818181814,341.7241379310344,23.418181818181814C349.6551724137931,23.418181818181814,357.5862068965517,23.418181818181814,365.51724137931035,23.418181818181814C373.44827586206895,23.418181818181814,381.37931034482756,23.418181818181814,389.31034482758616,23.418181818181814C397.24137931034477,23.418181818181814,405.17241379310343,23.418181818181814,413.10344827586204,23.418181818181814C421.03448275862064,23.418181818181814,428.9655172413793,23.418181818181814,436.8965517241379,23.418181818181814C444.82758620689657,23.418181818181814,452.7586206896552,23.418181818181814,460.68965517241384,23.418181818181814C468.62068965517244,23.418181818181814,476.55172413793105,23.418181818181814,484.48275862068965,23.418181818181814C492.4137931034483,23.418181818181814,500.3448275862069,23.418181818181814,508.2758620689656,23.418181818181814C516.2068965517242,23.418181818181814,524.1379310344828,23.418181818181814,532.0689655172414,23.418181818181814C540,23.418181818181814,547.9310344827586,23.418181818181814,555.8620689655172,23.418181818181814C563.7931034482758,23.418181818181814,571.7241379310345,23.418181818181814,579.6551724137931,23.418181818181814C587.5862068965517,23.418181818181814,595.5172413793102,23.418181818181814,603.4482758620688,23.418181818181814C611.3793103448276,23.418181818181814,619.3103448275862,23.418181818181814,627.2413793103449,23.418181818181814C635.1724137931035,23.418181818181814,643.103448275862,23.418181818181814,651.0344827586206,23.418181818181814C658.9655172413792,23.418181818181814,666.8965517241379,23.418181818181814,674.8275862068965,23.418181818181814C682.7586206896551,23.418181818181814,690.6896551724137,23.418181818181814,698.6206896551723,23.418181818181814C706.5517241379309,23.418181818181814,714.4827586206897,23.418181818181814,722.4137931034483,23.418181818181814C730.3448275862069,23.418181818181814,738.2758620689655,23.418181818181814,746.2068965517241,23.418181818181814C754.1379310344827,23.418181818181814,762.0689655172414,23.418181818181814,770,23.418181818181814"
+        fill="none" stroke-linecap="round" stroke-linejoin="bevel" stroke="#4338ca" stroke-width="2"
+        class="line ethr-mainnet"></path>
+</svg>
