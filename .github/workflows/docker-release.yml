@@ -16,11 +16,11 @@ on:
 jobs:
 
   docker-release:
-    uses: danubetech/workflows/.github/workflows/docker-release-static-version.yml@main
+    uses: danubetech/workflows/.github/workflows/docker-release.yml@main
     with:
       GLOBAL_IMAGE_NAME: universalregistrar/driver-did-ethr
       GLOBAL_REPO_NAME: docker.io
-      GLOBAL_RELEASE_VERSION: 0.1.0
+      GLOBAL_FRAMEWORK: node
       PATH_TO_DOCKERFILE: docker/Dockerfile
     secrets:
       VAULT_ADDR: ${{ secrets.VAULT_ADDR }}
